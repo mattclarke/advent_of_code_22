@@ -1,2 +1,2 @@
-# advent_of_code_23
-https://adventofcode.com/2023
+# advent_of_code_22
+https://adventofcode.com/2022
