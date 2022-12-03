@@ -11,3 +11,7 @@ https://adventofcode.com/2022
 
 Initially I did it "long hand" but went back and refactored to make it more compact.
 
+## Day 3
+- Part 1: loop, split and use a set to find the item that appears in both.
+- Part 2: similar but compare three elves to find the common item.
+
