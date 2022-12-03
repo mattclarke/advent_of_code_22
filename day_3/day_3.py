@@ -15,9 +15,9 @@ lines = [line.strip() for line in PUZZLE_INPUT.split("\n") if line]
 
 def score(ch):
     if ch.islower():
-        return ord(ch) - 96
+        return ord(ch) - ord('a') + 1
     else:
-        return ord(ch) - 65 + 27
+        return ord(ch) - ord('A') + 27
 
 
 result = 0
