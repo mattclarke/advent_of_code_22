@@ -19,3 +19,7 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 1: convert to ints and see if the whole range is contained.
 - Part 2: similar but see if either of the ends of one range are enclosed by the other range.
 
+## Day 5
+- Part 1: the hard part was extracting the data for the crates, it would have been quicker to copy that information by hand.
+- Part 2: same but use an additional stack to keep the crate order.
+
