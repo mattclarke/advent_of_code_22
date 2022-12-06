@@ -23,3 +23,7 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 1: the hard part was extracting the data for the crates, it would have been quicker to copy that information by hand.
 - Part 2: same but use an additional stack to keep the crate order.
 
+## Day 6
+- Part 1: use a queue to keep the last four characters in, then convert to a set. If the length of the set is 4 then we have the answer.
+- Part 2: same but the length is 14 rather than 4.
+
