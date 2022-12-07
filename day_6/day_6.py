@@ -42,8 +42,5 @@ for l in lines:
             stack.pop(0)
             stack.append(c)
 
-for l in lines:
-    pass
-
 # Part 2 = 3605
 print(f"answer = {result}")
