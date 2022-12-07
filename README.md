@@ -27,3 +27,6 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 1: use a queue to keep the last four characters in, then convert to a set. If the length of the set is 4 then we have the answer.
 - Part 2: same but the length is 14 rather than 4.
 
+## Day 7
+- Part 1: use a stack and sum the file sizes. When popping out of the directory add that directory's size to the enclosing directory. DON'T FORGET TO POP THE STACK AT THE END!
+- Part 2: filter to get directories of suitable size then find the smallest.
