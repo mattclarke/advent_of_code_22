@@ -19,34 +19,32 @@ for l in lines:
     TREES.append(row)
 
 cols = [-1 for _ in range(len(TREES[0]))]
-    
+
 for r, row in enumerate(TREES):
     height = -1
     for c, t in enumerate(row):
         if t > height:
             height = t
-            SEEN.add((r,c))
-    height =-1
+            SEEN.add((r, c))
+    height = -1
     for c, t in enumerate(reversed(row)):
         if t > height:
             height = t
-            SEEN.add((r,len(cols) - c - 1))
+            SEEN.add((r, len(cols) - c - 1))
     for c, t in enumerate(row):
-        if t> cols[c]:
+        if t > cols[c]:
             cols[c] = t
-            SEEN.add((r,c))
+            SEEN.add((r, c))
 
 cols = [-1 for _ in range(len(TREES[0]))]
 for r, row in enumerate(reversed(TREES)):
     for c, t in enumerate(row):
-        if t> cols[c]:
+        if t > cols[c]:
             cols[c] = t
-            SEEN.add((len(TREES) - r - 1,c))
-
-result = len(SEEN)
+            SEEN.add((len(TREES) - r - 1, c))
 
 # Part 1 = 1647
-print(f"answer = {result}")
+print(f"answer = {len(SEEN)}")
 
 result = 0
 
@@ -75,7 +73,7 @@ for s in SEEN:
     total *= score
 
     score = 0
-    c = s[1] - 1 
+    c = s[1] - 1
     while c >= 0:
         if TREES[s[0]][c] >= rmax:
             score += 1
@@ -85,7 +83,7 @@ for s in SEEN:
     total *= score
 
     score = 0
-    c = s[1] + 1 
+    c = s[1] + 1
     while c < len(TREES):
         if TREES[s[0]][c] >= rmax:
             score += 1
@@ -95,5 +93,5 @@ for s in SEEN:
     total *= score
     result = max(total, result)
 
-# Part 2 = 392080 
+# Part 2 = 392080
 print(f"answer = {result}")
