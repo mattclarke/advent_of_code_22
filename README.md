@@ -30,3 +30,8 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 ## Day 7
 - Part 1: use a stack and sum the file sizes. When popping out of the directory add that directory's size to the enclosing directory. DON'T FORGET TO POP THE STACK AT THE END!
 - Part 2: filter to get directories of suitable size then find the smallest.
+
+## Day 8
+- Part 1: loop through the rows and columns (forward and reverse) and add the trees that can be seen from outside to a set.
+- Part 2: for each tree in the set, go in each direction until reaches edge or hits a tree that cannot be seen over. After each direction multiple the score.
+

@@ -49,48 +49,41 @@ print(f"answer = {len(SEEN)}")
 result = 0
 
 for s in SEEN:
-    r = s[0] - 1
     rmax = TREES[s[0]][s[1]]
     total = 1
 
     score = 0
-    while r >= 0:
+    for r in range(s[0], 0, -1):
+        if TREES[r - 1][s[1]] >= rmax:
+            score += 1
+            break
+        score += 1
+    total *= score
+
+    score = 0
+    for r in range(s[0] + 1, len(TREES)):
         if TREES[r][s[1]] >= rmax:
             score += 1
             break
         score += 1
-        r -= 1
     total *= score
 
     score = 0
-    r = s[0] + 1
-    while r < len(TREES):
-        if TREES[r][s[1]] >= rmax:
+    for c in range(s[1], 0, -1):
+        if TREES[s[0]][c - 1] >= rmax:
             score += 1
             break
         score += 1
-        r += 1
     total *= score
 
     score = 0
-    c = s[1] - 1
-    while c >= 0:
+    for c in range(s[1] + 1, len(TREES[0])):
         if TREES[s[0]][c] >= rmax:
             score += 1
             break
         score += 1
-        c -= 1
     total *= score
 
-    score = 0
-    c = s[1] + 1
-    while c < len(TREES):
-        if TREES[s[0]][c] >= rmax:
-            score += 1
-            break
-        score += 1
-        c += 1
-    total *= score
     result = max(total, result)
 
 # Part 2 = 392080
