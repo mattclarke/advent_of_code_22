@@ -35,3 +35,7 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 1: loop through the rows and columns (forward and reverse) and add the trees that can be seen from outside to a set.
 - Part 2: for each tree in the set, go in each direction until reaches edge or hits a tree that cannot be seen over. After each direction multiple the score.
 
+## Day 9
+- Part 1: move the head and if the tail is not adjecent move it towards the head. Store tail's position in a set.
+- Part 2: create a list of the ten knots, move the first one and then update the others based on the preceeding knot. Store the last knot's position in a set.
+
