@@ -11,20 +11,22 @@ lines = [line.strip() for line in PUZZLE_INPUT.split("\n") if line]
 
 result = 0
 
-X =1
+X = 1
 Q = None
 cycle = 1
-finish = False
-busy = False
-add = 0
+image = []
 
 while lines or Q is not None:
-    if cycle in  [20, 60, 100, 140, 180, 220]:
+    if cycle in [20, 60, 100, 140, 180, 220]:
         result += cycle * X
+    if (cycle - 1) % 40 in [X - 1, X, X + 1]:
+        image.append("#")
+    else:
+        image.append(" ")
     if lines and Q is None:
         l = lines.pop(0)
-        if l != 'noop':
-            op, val = l.split(' ')
+        if l != "noop":
+            op, val = l.split(" ")
             Q = int(val)
             cycle += 1
             continue
@@ -32,12 +34,15 @@ while lines or Q is not None:
         X += Q
         Q = None
     cycle += 1
-    
 
-# Part 1 = 13860 
+
+# Part 1 = 13860
 print(f"answer = {result}")
 
-result = 0
+for i, x in enumerate(image):
+    print(x, end="")
+    if (i + 1) % 40 == 0:
+        print("")
 
-# Part 2 = 
-print(f"answer = {result}")
+# Read the answer off the screen
+# Part 2 = RZHFGJCB
