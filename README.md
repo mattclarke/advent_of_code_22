@@ -39,3 +39,7 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 1: move the head and if the tail is not adjecent move it towards the head. Store tail's position in a set.
 - Part 2: create a list of the ten knots, move the first one and then update the others based on the preceeding knot. Store the last knot's position in a set.
 
+## Day 10
+- Part 1: started by not reading the instructions correctly! If it is an add command then it "execute" during the next cycle, so store the value to be added and do the addition next turn.
+- Part 2: if the current pixel is within one of the value in the register the pixel is on. Requires some modulo to get the lines.
+
