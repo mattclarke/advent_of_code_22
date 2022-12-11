@@ -48,6 +48,7 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 2: need to keep the worry smallish otherwise the maths starts to get slow (e.g. taking the modulus of a big number takes a long time). I guessed (after a few attempts) that the solution was to modulo the worry by the LCM of all the monkeys' divisors. Not entirely sure why that works...
 
 UPDATE:
+
 We don't care about the worry as such we only care how it responds to having a modulo applied. 
 
 For addition:
