@@ -52,20 +52,20 @@ UPDATE:
 We don't care about the worry value as such, we only care how it responds to having a modulo applied. 
 
 For addition:
- - `x + a` is divisible by y if `(x % y) + a` is divisible by y.
+ - `(x + a) % y` = `((x % y) + (a % y)) % y`
 
 For multiplication:
- - `x * a` is divisible by y if `(x % y) * a` is divisible by y.
+ - `(x * a) % y` = `((x % y) * (a % y)) % y`
 
 Examples:
 ```
-(30 + 8) % 19 = 0 and ((30 % 19) + 8) % 19 = 0
-(35 + 8) % 19 = 5 and ((35 % 19) + 8) % 19 = 5
+(30 + 8) % 19 = 0 and ((30 % 19) + (8 % 19)) % 19 = 0
+(35 + 8) % 19 = 5 and ((35 % 19) + (8 % 19)) % 19 = 5
 
-(38 * 4) % 19 = 0 and ((38 % 19) * 4) % 19 = 0
-(20 * 4) % 19 = 4 and ((20 % 19) * 4) % 19 = 4
+(38 * 4) % 19 = 0 and ((38 % 19) * (4 % 19)) % 19 = 0
+(20 * 4) % 19 = 4 and ((20 % 19) * (4 % 19)) % 19 = 4
 
-(45 * 45) % 19 = 11 and ((45 % 19) * 45) % 19 = 11
+(45 * 45) % 19 = 11 and ((45 % 19) * (45 % 19)) % 19 = 11
 ```
-And because there are multiple divisors we need the LCM.
+As there are multiple divisors we need to use the LCM as it is the lowest value that is valid for all the divisors.
 
