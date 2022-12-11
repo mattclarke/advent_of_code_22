@@ -43,3 +43,27 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 - Part 1: started by not reading the instructions correctly! If it is an add command then it "execute" during the next cycle, so store the value to be added and do the addition next turn.
 - Part 2: if the current pixel is within one of the value in the register the pixel is on. Requires some modulo to get the lines.
 
+## Day 11
+- Part 1: implement the algorithm as described. I typed the puzzle data in by hand rather than parse it!
+- Part 2: need to keep the worry smallish otherwise the maths starts to get slow (e.g. taking the modulus of a big number takes a long time). I guessed (after a few attempts) that the solution was to modulo the worry by the LCM of all the monkeys' divisors. Not entirely sure why that works...
+
+UPDATE:
+We don't care about the worry as such we only care how it responds to having a modulo applied. 
+
+For addition:
+ - `x + a` is divisible by 19 if `(x % 19) + a` is divisible by 19.
+For multiplication:
+ - `x * a` is divisible by 19 if `(x % 19) * a` is divisible by 19.
+
+Examples:
+```
+(30 + 8) % 19 = 0 and ((30 % 19) + 8) % 19 = 0
+(35 + 8) % 19 = 5 and ((35 % 19) + 8) % 19 = 5
+
+(38 * 4) % 19 = 0 and ((38 % 19) * 4) % 19 = 0
+(20 * 4) % 19 = 4 and ((20 % 19) * 4) % 19 = 4
+
+(45 * 45) % 19 = 11 and ((45 % 19) * 45) % 19 = 11
+```
+And because there are multiple divisors we need the LCM.
+
