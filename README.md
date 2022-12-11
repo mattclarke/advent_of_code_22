@@ -52,9 +52,10 @@ UPDATE:
 We don't care about the worry value as such, we only care how it responds to having a modulo applied. 
 
 For addition:
- - `x + a` is divisible by 19 if `(x % 19) + a` is divisible by 19.
+ - `x + a` is divisible by y if `(x % y) + a` is divisible by y.
+
 For multiplication:
- - `x * a` is divisible by 19 if `(x % 19) * a` is divisible by 19.
+ - `x * a` is divisible by y if `(x % y) * a` is divisible by y.
 
 Examples:
 ```
