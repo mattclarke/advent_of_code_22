@@ -49,7 +49,7 @@ Initially I did it "long hand" but went back and refactored to make it more comp
 
 UPDATE:
 
-We don't care about the worry as such we only care how it responds to having a modulo applied. 
+We don't care about the worry value as such, we only care how it responds to having a modulo applied. 
 
 For addition:
  - `x + a` is divisible by 19 if `(x % 19) + a` is divisible by 19.
