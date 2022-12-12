@@ -28,7 +28,7 @@ for r, l in enumerate(lines):
 
 
 def solve(queue):
-    best = {}
+    best = set()
 
     while queue:
         cnt, pos = queue.pop(0)
@@ -42,23 +42,20 @@ def solve(queue):
                 or npos[1] == len(GRID[0])
             ):
                 continue
+            if npos in best:
+                continue
             nl = GRID[npos[0]][npos[1]]
             if nl == "a" and cl == "S":
                 queue.append((cnt + 1, npos))
                 continue
             elif nl == "E" and cl == "z":
-                tmp = best.get(npos, 100000000000)
-                if cnt + 1 < tmp:
-                    best[npos] = cnt + 1
-                break
+                return cnt + 1
             elif nl == "E":
                 continue
             elif ord(nl) - ord(cl) <= 1:
-                tmp = best.get(npos, 100000000000)
-                if cnt + 1 < tmp:
-                    best[npos] = cnt + 1
-                    queue.append((cnt + 1, npos))
-    return best[END]
+                best.add(npos)
+                queue.append((cnt + 1, npos))
+    assert False
 
 
 # Part 1 = 380
