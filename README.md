@@ -68,4 +68,18 @@ Examples:
 (45 * 45) % 19 = 11 and ((45 % 19) * (45 % 19)) % 19 = 11
 ```
 As there are multiple divisors we need to use the LCM as it is the lowest value that is valid for all the divisors.
+```
+Consider 17 and 19:
+  17 * 19 = 323
+
+  500 % 17 = 7
+  500 % 323 = 177 => 177 % 17 = 7
+
+  500 % 19 = 6
+  500 % 323 = 177 => 177 % 19 = 6
+```
+
+## Day 12
+- Part 1: used a BFS to find the route.
+- Part 2: same but with multiple starting points.
 
