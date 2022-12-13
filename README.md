@@ -83,3 +83,7 @@ Consider 17 and 19:
 - Part 1: used a BFS to find the route.
 - Part 2: same but with multiple starting points.
 
+## Day 13
+- Part 1: created a recursive comparison function. Recursive to handle lists within lists.
+- Part 2: used the function from part 1 with `functools.cmp_to_key` to order the signals.
+
