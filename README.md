@@ -87,3 +87,7 @@ Consider 17 and 19:
 - Part 1: created a recursive comparison function. Recursive to handle lists within lists.
 - Part 2: used the function from part 1 with `functools.cmp_to_key` to order the signals.
 
+## Day 14
+- Part 1: reasonably straightforward to implement the algorithm using sets. Stop the simulation when sand exceeds either the horizontal or vertical bounds.
+- Part 2: same as part 1 except the addition of an infinite floor. Stop when sand is added to the sand origin.
+
