@@ -26,25 +26,41 @@ print(1)
 target = 2000000
 min_ = 100000000000
 max_ = 0
+
+md = {} 
+
 for s, b in sensors.items():
-    if s:
-        dc = abs(s[0] - b[0])
-        dr = abs(s[1] - b[1])
-        md = dc + dr
-        if abs(s[1] - target) > md:
-            continue
+    dc = abs(s[0] - b[0])
+    dr = abs(s[1] - b[1])
+    md[s] = dc + dr
 
-        for dr in range(-md-1, md+1):
-            if s[1]+dr != target:
+for r in range(0,4000000):
+    c =0
+    while c <= 4000000:
+        inrange = False
+        for s, b in sensors.items():
+            m = md[s]
+            # is c,r in range of sensor?
+            mdr = m - abs(s[1] - r)
+            if mdr <= 0:
                 continue
-            for dc in range(-md-1,md+1):
-                if abs(dr) + abs(dc) <= md:
-                    if (s[0]+dc, s[1]+dr) not in sensors and (s[0]+dc, s[1]+dr) not in beacons:
-                        empty.add((s[0]+dc, s[1]+dr))
-                        min_ = min(min_, s[0]+dc)
-                        max_ = max(max_, s[0]+dc)
+            cmin = s[0] - mdr
+            cmax = s[0] + mdr
+            #print(r, c, m, mdr, cmin, cmax, s)
+            if cmin <= c < cmax:
+                c = cmax + 1
+                inrange = True
+                #print('foung')
+                break
+            if (c, r) in sensors or (c, r) in beacons:
+                c += 1
+                inrange = True
+        if not inrange:
+            assert False, 4000000*c + r
 
-print(min_, max_)
+        
+
+
 
 
 def print_grid():
@@ -61,15 +77,7 @@ def print_grid():
                 row.append(".")
         print("".join(row))
 print(2)
-result = 0
-for c in range(min_-1, max_+1):
-    if (c, target) in empty:
-        result += 1
 
-# Part 1 = 5403290
-print(f"answer = {result}")
-
-result = 0
 
 # Part 2 = 
 print(f"answer = {result}")
