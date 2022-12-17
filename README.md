@@ -91,3 +91,11 @@ Consider 17 and 19:
 - Part 1: reasonably straightforward to implement the algorithm using sets. Stop the simulation when sand exceeds either the horizontal or vertical bounds.
 - Part 2: same as part 1 except the addition of an infinite floor. Stop when sand is added to the sand origin.
 
+## Day 15
+- Part 1: .
+- Part 2: .
+
+## Day 16
+- Part 1: implement the "game" - took me a while to do this!
+- Part 2: target to big to simulate, but after the simulation settles down the height increase per shape repeats. The repetition allows the answer to be derived mathematically, see the code for details.
+
