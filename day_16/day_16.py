@@ -95,7 +95,9 @@ while q:
             continue
         best[(mn, frozenset(state))] = press
     if dist > 0:
-        heappush(q, (press, toadd, minute + 1, curr, copy.copy(state), dist - 1, is_elep))
+        heappush(
+            q, (press, toadd, minute + 1, curr, copy.copy(state), dist - 1, is_elep)
+        )
         continue
     if dist == 0:
         press = press - toadd
