@@ -14,21 +14,6 @@ result = 0
 
 VALVES = {}
 
-[
-    "Valve",
-    "AA",
-    "has",
-    "flow",
-    "rate=0;",
-    "tunnels",
-    "lead",
-    "to",
-    "valves",
-    "DD,",
-    "II,",
-    "BB",
-]
-
 for l in lines:
     l = l.split()
     v = l[1]
@@ -103,10 +88,13 @@ test = ["JJ", "DD", "HH", "BB", "CC", "EE"]
 while q:
     press, minute, me, elep, state, mdist, edist = heappop(q)
     nstate = copy.copy(state)
-    foo = best.get((minute, tuple(state)), 0)
-    if press > foo:
-        continue
-    best[(minute, tuple(state))] = press
+    # Guessed that by the time we have 4 valves open, the best
+    # arrangment is the optimal configuration.
+    # Saves a lot of time as we can skip many configurations.
+    if len(state) > 4:
+        if press > best.get((minute, frozenset(state)), 0):
+            continue
+        best[(minute, frozenset(state))] = press
     moptions = []
     if mdist == 0:
         if me != "AA":
@@ -171,6 +159,7 @@ while q:
                 q, (press, minute + 1, me, tgt, copy.copy(nstate), mdist - 1, dist)
             )
     elif len(moptions) == 1 and len(eoptions) == 1 and moptions[0] == eoptions[0]:
+        # Only one node left for both, so send the one closet
         _, s1, d1, t1 = moptions[0]
         _, s2, d2, t2 = eoptions[0]
         if d1 <= d2:
@@ -186,6 +175,7 @@ while q:
                     continue
                 heappush(q, (press, minute + 1, t1, t2, copy.copy(nstate), d1, d2))
     else:
+        # No nodes within reach within the remaining time
         heappush(
             q, (press, minute + 1, me, elep, copy.copy(nstate), mdist - 1, edist - 1)
         )
