@@ -14,21 +14,6 @@ result = 0
 
 VALVES = {}
 
-[
-    "Valve",
-    "AA",
-    "has",
-    "flow",
-    "rate=0;",
-    "tunnels",
-    "lead",
-    "to",
-    "valves",
-    "DD,",
-    "II,",
-    "BB",
-]
-
 for l in lines:
     l = l.split()
     v = l[1]
@@ -84,7 +69,6 @@ while q:
         if dist >= 30 - minute:
             continue
         options.append((VALVES[npos][0] * (30 - minute - dist), dist, npos))
-    options.sort()
     for score, dist, tgt in options:
         nstate = copy.copy(state)
         nstate.append(tgt)
@@ -103,10 +87,13 @@ test = ["JJ", "DD", "HH", "BB", "CC", "EE"]
 while q:
     press, minute, me, elep, state, mdist, edist = heappop(q)
     nstate = copy.copy(state)
-    foo = best.get((minute, tuple(state)), 0)
-    if press > foo:
-        continue
-    best[(minute, tuple(state))] = press
+    # Guessed that by the time we have 4 valves open, the best
+    # arrangment is the optimal configuration.
+    # Saves a lot of time as we can skip many configurations.
+    if len(state) > 4:
+        if press > best.get((minute, frozenset(state)), 0):
+            continue
+        best[(minute, frozenset(state))] = press
     moptions = []
     if mdist == 0:
         if me != "AA":
@@ -119,13 +106,10 @@ while q:
                 continue
             moptions.append(
                 (
-                    VALVES[npos][0] * (length - minute - dist),
-                    VALVES[npos][0],
                     dist,
                     npos,
                 )
             )
-        moptions.sort()
     eoptions = []
     if edist == 0:
         if elep != "AA":
@@ -138,13 +122,10 @@ while q:
                 continue
             eoptions.append(
                 (
-                    VALVES[npos][0] * (length - minute - dist),
-                    VALVES[npos][0],
                     dist,
                     npos,
                 )
             )
-        eoptions.sort()
     if minute <= length:
         add = 0
         for s in nstate:
@@ -157,35 +138,37 @@ while q:
         heappush(q, (press, minute + 1, me, elep, nstate, mdist - 1, edist - 1))
         continue
     if moptions and not eoptions:
-        for _, score, dist, tgt in moptions:
+        for dist, tgt in moptions:
             if tgt == elep:
                 continue
             heappush(
                 q, (press, minute + 1, tgt, elep, copy.copy(nstate), dist, edist - 1)
             )
     elif eoptions and not moptions:
-        for _, score, dist, tgt in eoptions:
+        for dist, tgt in eoptions:
             if tgt == me:
                 continue
             heappush(
                 q, (press, minute + 1, me, tgt, copy.copy(nstate), mdist - 1, dist)
             )
     elif len(moptions) == 1 and len(eoptions) == 1 and moptions[0] == eoptions[0]:
-        _, s1, d1, t1 = moptions[0]
-        _, s2, d2, t2 = eoptions[0]
+        # Only one node left for both, so send the one closest
+        d1, t1 = moptions[0]
+        d2, t2 = eoptions[0]
         if d1 <= d2:
             heappush(q, (press, minute + 1, t1, elep, copy.copy(nstate), d1, edist))
         else:
             heappush(q, (press, minute + 1, me, t2, copy.copy(nstate), mdist, d2))
     elif moptions and eoptions:
-        for _, s1, d1, t1 in moptions:
+        for d1, t1 in moptions:
             if t1 == elep:
                 continue
-            for _, s2, d2, t2 in eoptions:
+            for d2, t2 in eoptions:
                 if t1 == t2 or t2 == me:
                     continue
                 heappush(q, (press, minute + 1, t1, t2, copy.copy(nstate), d1, d2))
     else:
+        # No nodes within reach within the remaining time
         heappush(
             q, (press, minute + 1, me, elep, copy.copy(nstate), mdist - 1, edist - 1)
         )

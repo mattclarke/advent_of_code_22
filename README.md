@@ -92,8 +92,8 @@ Consider 17 and 19:
 - Part 2: same as part 1 except the addition of an infinite floor. Stop when sand is added to the sand origin.
 
 ## Day 15
-- Part 1: .
-- Part 2: .
+- Part 1: used a heapq to prioritise the most promising solutions.
+- Part 2: took many many hours. Rewrote part 1 to try to optimise the solutions. Reduced the nodes down to only those that can be opened and calculated the distance to all other nodes. Lots of ifs, so was a bit buggy. Getting the right answer the first time took ~10 minutes, but with some pruning managed to get it down to ~70 seconds (pypy). Would like to make it a bit neater!
 
 ## Day 16
 - Part 1: implement the "game" - took me a while to do this!
