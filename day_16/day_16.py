@@ -51,7 +51,6 @@ q = []
 heappush(q, (0, 0, 1, "AA", [], 0))
 best = {}
 
-
 while q:
     press, toadd, minute, curr, state, dist = heappop(q)
     if dist > 0:
@@ -77,12 +76,10 @@ while q:
 # Part 1 = 1488
 print(f"answer = {-result}")
 
-
 result = 0
 q = []
 heappush(q, (0, 0, 1, "AA", [], 0, False))
 best = {}
-
 
 while q:
     press, toadd, minute, curr, state, dist, is_elep = heappop(q)
@@ -120,7 +117,6 @@ while q:
         # minute 1 and carry on.
         nstate = copy.copy(state)
         heappush(q, (press, 0, 1, "AA", nstate, 0, True))
-
 
 # Part 2 = 2111
 print(f"answer = {-result}")
