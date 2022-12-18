@@ -99,3 +99,8 @@ Consider 17 and 19:
 - Part 1: implement the "game" - took me a while to do this!
 - Part 2: target to big to simulate, but after the simulation settles down the height increase per shape repeats. The repetition allows the answer to be derived mathematically, see the code for details.
 
+An alternative would have been to record the top ~30 rows after each rock and see when a repeat occurs.
+
+## Day 17
+- Part 1: for each rock check all the sides to see if there is air next to it.
+- Part 2: surround the area with 'water' and for any cube that touches water fill that one. Repeat until water has got every where it can, then count the rock sides that touch water.

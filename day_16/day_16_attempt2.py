@@ -50,32 +50,91 @@ for o in CAN_OPEN:
 
 result = 0
 q = []
-heappush(q, (0, 1, 'AA',  []))
-seen = set()
+heappush(q, (0, 0, 1, 'AA',  [], 0))
 best = {}
 
-while q:
-    press, minute, curr, state = heappop(q)
-    if minute >= 30 or set(state) == CAN_OPEN:
-        result = min(result, press)
-        if (set(state) == CAN_OPEN):
-            print(result, len(q), set(state) == CAN_OPEN, state)
-        continue
-    if (press, minute, curr, frozenset(state)) in seen:
-        continue
-    foo = best.get(frozenset(state), 0)
-    if press > foo:
-        continue
-    best[frozenset(state)] = press
-    seen.add((press, minute, curr, frozenset(state)))
-    if curr not in state:
-        nstate = copy.copy(state)
-        nstate.append(curr)
-        npress = press - (VALVES[curr][0] * (30 - minute))
-        heappush(q, (npress, minute+1, curr, nstate))
-    for npos in CAN_OPEN:
-        if npos in state or npos == curr:
-            continue
-        heappush(q, (press, minute + DISTS[(curr, npos)], npos, copy.copy(state)))
 
+while q:
+    press, toadd, minute, curr, state, dist = heappop(q)
+    if dist > 0:
+        heappush(q, (press, toadd,  minute + 1, curr, state, dist - 1))
+        continue
+    if dist == 0:
+        press = press - toadd
+        result = min(result, press)
+        toadd = 0
+    options = []
+    for npos in CAN_OPEN:
+        if npos in state:
+            continue
+        dist = DISTS[(curr, npos)]
+        if dist >= 30 - minute:
+            continue
+        options.append((VALVES[npos][0] * (30 - minute - dist), dist, npos))
+    options.sort()
+    for score, dist, tgt in options:
+        nstate = copy.copy(state)
+        nstate.append(tgt)
+        heappush(q, (press, score, minute + 1, tgt, nstate, dist))
+
+print(result)
+
+result = 0
+q = []
+heappush(q, (0, 1, 'AA', 'AA', [], 10000, 0, 0, 0))
+best = {}
+
+
+while q:
+    press, minute, me, elep, state, mdist, edist, madd, eadd = heappop(q)
+#    print(minute, press, me, elep)
+#    input()
+    if mdist > 0 and edist > 0:
+        heappush(q, (press, minute + 1, me, elep, state, mdist - 1, edist - 1, madd, eadd))
+        continue
+    moptions = []
+    if mdist == 0:
+        press = press - madd
+        result = min(result, press)
+        madd = 0
+        for npos in CAN_OPEN:
+            if npos in state:
+                continue
+            dist = DISTS[(me, npos)]
+            if dist >= 30 - minute:
+                continue
+            moptions.append((VALVES[npos][0] * (30 - minute - dist), dist, npos))
+        moptions.sort()
+    eoptions = []
+    if edist == 0:
+        press = press - eadd
+        result = min(result, press)
+        eadd = 0
+        for npos in CAN_OPEN:
+            if npos in state:
+                continue
+            dist = DISTS[(elep, npos)]
+            if dist >= 30 - minute:
+                continue
+            eoptions.append((VALVES[npos][0] * (30 - minute - dist), dist, npos))
+        eoptions.sort()
+    if moptions and not eoptions:
+        for score, dist, tgt in moptions:
+            nstate = copy.copy(state)
+            nstate.append(tgt)
+            heappush(q, (press, minute + 1, tgt, elep, nstate, dist, edist-1, score, eadd))
+    elif eoptions and not moptions:
+        for score, dist, tgt in eoptions:
+            nstate = copy.copy(state)
+            nstate.append(tgt)
+            heappush(q, (press, minute + 1, me, tgt, nstate, mdist-1, dist, madd, score))
+    else:
+        for s1, d1, t1 in moptions:
+            for s2, d2, t2 in eoptions:
+                if t1 == t2:
+                    continue
+                nstate = copy.copy(state)
+                nstate.append(t1)
+                nstate.append(t2)
+                heappush(q, (press, minute + 1, t1, t2, nstate, d1, d2, s1, s2))
 print(result)
