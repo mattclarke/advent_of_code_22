@@ -82,7 +82,6 @@ q = []
 heappush(q, (0, 1, "AA", "AA", [], 0, 0))
 best = {}
 length = 26
-test = ["JJ", "DD", "HH", "BB", "CC", "EE"]
 
 while q:
     press, minute, me, elep, state, mdist, edist = heappop(q)
