@@ -8,14 +8,21 @@ with open(FILE) as f:
     PUZZLE_INPUT = f.read()
 
 lines = [line.strip() for line in PUZZLE_INPUT.split("\n") if line]
-print(lines)
 
 result = 0
+CUBES = set()
+
 
 for l in lines:
-    pass
+    coords = tuple([int(x) for x in l.split(',')])
+    CUBES.add(coords)
 
-# Part 1 = 
+for cube in CUBES:
+    for x, y, z in [(1, 0,0), (-1, 0,0), (0, 1,0), (0, -1,0), (0,0,1), (0,0,-1)]:
+        if (cube[0] + x, cube[1] + y, cube[2] + z) not in CUBES:
+            result += 1
+
+# Part 1 = 4636
 print(f"answer = {result}")
 
 result = 0
