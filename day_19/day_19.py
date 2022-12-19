@@ -13,7 +13,6 @@ lines = [line.strip() for line in PUZZLE_INPUT.split("\n") if line]
 BLUEPRINTS = {}
 
 result = 0
-['Blueprint', '1:', 'Each', 'ore', 'robot', 'costs', '4', 'ore.', 'Each', 'clay', 'robot', 'costs', '2', 'ore.', 'Each', 'obsidian', 'robot', 'costs', '3', 'ore', 'and', '14', 'clay.', 'Each', 'geode', 'robot', 'costs', '2', 'ore', 'and', '7', 'obsidian.']
 
 for i, l in enumerate(lines):
     parts = l.split()
@@ -32,6 +31,14 @@ for num, bp in BLUEPRINTS.items():
 
     while q:
         score, minute, (r_ore, r_clay, r_obs, r_geode), (ore, clay, obs, geode), state, ignore = heappop(q)
+
+        if ore > max(bp[0][0], bp[1][0]) and (r_ore +r_clay) == 1:
+            # if we haven't build anything yet then bail
+            continue
+        if clay > bp[2][1] and ore >= bp[2][0] and r_obs == 0:
+            # if we haven't build anything yet then bail
+            continue
+
         if minute > 24:
             result = max(result, geode)
             continue
@@ -43,10 +50,10 @@ for num, bp in BLUEPRINTS.items():
         for rp, rtype in zip(bp, ['ore', 'clay', 'obs', 'geode']):
             if ore >= rp[0] and clay >= rp[1] and obs >= rp[2]:
                 can_build.append(rtype)
-        if 'geode' in can_build:
-            can_build = ['geode']
-        if 'obs' in can_build:
-            can_build = ['obs']
+        #if 'geode' in can_build:
+        #    can_build = ['geode']
+        #if 'obs' in can_build:
+        #    can_build = ['obs']
 
         ore += r_ore
         clay += r_clay
