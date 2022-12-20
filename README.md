@@ -108,3 +108,8 @@ An alternative would have been to record the top ~30 rows after each rock and se
 ## Day 17
 - Part 1: for each rock check all the sides to see if there is air next to it.
 - Part 2: surround the area with 'water' and for any cube that touches water fill that one. Repeat until water has got every where it can, then count the rock sides that touch water.
+
+## Day 18
+- Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
+- Part 2: the stepsize is huge, but as the list is circular we can use the modulo to reduce it. Took a while for me to realise I needed to take the modulo of the number of nodes - 1 because we have detached the original node!
+
