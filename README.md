@@ -92,6 +92,10 @@ Consider 17 and 19:
 - Part 2: same as part 1 except the addition of an infinite floor. Stop when sand is added to the sand origin.
 
 ## Day 15
+- Part 1: .
+- Part 2: .
+
+## Day 16
 - Part 1: used a heapq to prioritise the most promising solutions.
 - Part 2: took many many hours. Rewrote part 1 to try to optimise the solutions. Reduced the nodes down to only those that can be opened and calculated the distance to all other nodes. Lots of ifs, so was a bit buggy. Getting the right answer the first time took ~10 minutes, but with some pruning managed to get it down to ~70 seconds (pypy). Would like to make it a bit neater!
 
@@ -99,17 +103,25 @@ UPDATE: realised that there was **no reason to do both in parallel**: I can do a
 
 Note: it doesn't work for the example because I can open all the valves before changing to the elephant.
 
-## Day 16
+## Day 17
 - Part 1: implement the "game" - took me a while to do this!
 - Part 2: target to big to simulate, but after the simulation settles down the height increase per shape repeats. The repetition allows the answer to be derived mathematically, see the code for details.
 
 An alternative would have been to record the top ~30 rows after each rock and see when a repeat occurs.
 
-## Day 17
+## Day 18
 - Part 1: for each rock check all the sides to see if there is air next to it.
 - Part 2: surround the area with 'water' and for any cube that touches water fill that one. Repeat until water has got every where it can, then count the rock sides that touch water.
 
-## Day 18
+## Day 19
+- Part 1: .
+- Part 2: .
+
+## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
 - Part 2: the stepsize is huge, but as the list is circular we can use the modulo to reduce it. Took a while for me to realise I needed to take the modulo of the number of nodes - 1 because we have detached the original node!
+
+## Day 21
+- Part 1: implement the algorithm as described.
+- Part 2: apply the modifications and then binary search for the correct value. I did it by hand because I am lazy!
 
