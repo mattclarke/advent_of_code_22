@@ -69,7 +69,7 @@ def solve(part_2=False):
             geo += r_geo
             minute += 1
 
-            nscore = -r_geo
+            nscore = -minute
 
             if not can_build:
                 heappush(

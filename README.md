@@ -117,6 +117,9 @@ An alternative would have been to record the top ~30 rows after each rock and se
 - Part 1: use a heapq to queue all the "choices" and then work through them. Using a number of tricks to skip branches, such as bailing if the same state has been achieving in a quicker time, don't build more robots than we need, etc. Still pretty slow at ~6 minutes with pypy.
 - Part 2: adjusted to new rules. Takes ~15 minutes to complete. Will try to speed it up.
 
+Update:
+- replacing the "score" with `minutes` rather than `r_geo` brings the times down to ~175s and ~700s. Using `minutes` is almost the same as doing a DFS? 
+
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
 - Part 2: the stepsize is huge, but as the list is circular we can use the modulo to reduce it. Took a while for me to realise I needed to take the modulo of the number of nodes - 1 because we have detached the original node!
