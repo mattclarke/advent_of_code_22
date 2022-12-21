@@ -92,8 +92,8 @@ Consider 17 and 19:
 - Part 2: same as part 1 except the addition of an infinite floor. Stop when sand is added to the sand origin.
 
 ## Day 15
-- Part 1: .
-- Part 2: .
+- Part 1: for each sensor, mark all empty coordinates that are within the Manhatten distance and on the specified row 
+- Part 2: for each row and column, see if it reachable from a sensor. If it is reachable from a sensor, then jump forward to the next column that cannot be reached from that sensor (checking each column would take forever!). If not reachable then we are done. 
 
 ## Day 16
 - Part 1: used a heapq to prioritise the most promising solutions.
@@ -123,5 +123,5 @@ An alternative would have been to record the top ~30 rows after each rock and se
 
 ## Day 21
 - Part 1: implement the algorithm as described.
-- Part 2: apply the modifications and then binary search for the correct value. I did it by hand because I am lazy!
+- Part 2: apply the modifications and then binary search for the correct value. Initially, I did it by hand because I am lazy!
 
