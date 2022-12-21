@@ -20,77 +20,183 @@ for i, l in enumerate(lines):
     clay = (int(parts[12]), 0, 0)
     obs = (int(parts[18]), int(parts[21]), 0)
     geode = (int(parts[27]), 0, int(parts[30]))
-    BLUEPRINTS[i+1] = (ore, clay, obs, geode) 
+    BLUEPRINTS[i + 1] = (ore, clay, obs, geode)
 
-RESULTS = {}
 
-for num, bp in BLUEPRINTS.items():
-    q = [(-1,1, (1, 0, 0, 0), (0,0,0,0), [0],[])]
-    BEST = {}
-    result = 0
+def solve(part_2=False):
+    RESULTS = {}
+    num_minutes = 32 if part_2 else 24
 
-    while q:
-        score, minute, (r_ore, r_clay, r_obs, r_geode), (ore, clay, obs, geode), state, ignore = heappop(q)
+    for num, bp in BLUEPRINTS.items():
+        if part_2 and num > 3:
+            break
 
-        if ore > max(bp[0][0], bp[1][0]) and (r_ore +r_clay) == 1:
-            # if we haven't build anything yet then bail
-            continue
-        if clay > bp[2][1] and ore >= bp[2][0] and r_obs == 0:
-            # if we haven't build anything yet then bail
-            continue
+        q = [(-1, 1, (1, 0, 0, 0), (0, 0, 0, 0), set())]
+        BEST = {}
+        result = 0
+        max_ore = max(bp[0][0], bp[1][0], bp[2][0], bp[3][0])
+        max_cla = max(bp[0][1], bp[1][1], bp[2][1], bp[3][1])
+        max_obs = max(bp[0][2], bp[1][2], bp[2][2], bp[3][2])
 
-        if minute > 24:
-            result = max(result, geode)
-            continue
-        best = BEST.get(minute, [0])
-        if len(best) >= len(state) and state[minute -1] < best[minute-1]:
-            continue
-        BEST[minute] = copy.copy(state)
-        can_build = []
-        for rp, rtype in zip(bp, ['ore', 'clay', 'obs', 'geode']):
-            if ore >= rp[0] and clay >= rp[1] and obs >= rp[2]:
-                can_build.append(rtype)
-        #if 'geode' in can_build:
-        #    can_build = ['geode']
-        #if 'obs' in can_build:
-        #    can_build = ['obs']
+        while q:
+            (
+                score,
+                minute,
+                (r_ore, r_cla, r_obs, r_geo),
+                (ore, cla, obs, geo),
+                ignore,
+            ) = heappop(q)
 
-        ore += r_ore
-        clay += r_clay
-        obs += r_obs
-        geode += r_geode
+            if minute > num_minutes:
+                if geo > result:
+                    print(result, len(q))
+                result = max(result, geo)
+                continue
 
-        nstate = copy.copy(state)
-        nstate.append(geode)
-        
-        if can_build and can_build != ignore:
+            if ((r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo)) in BEST:
+                if BEST[((r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] <= minute:
+                    continue
+            BEST[((r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] = minute
+
+            can_build = set()
+            for rp, rtype in zip(bp, ["ore", "cla", "obs", "geo"]):
+                if ore >= rp[0] and cla >= rp[1] and obs >= rp[2]:
+                    can_build.add(rtype)
+
+            ore += r_ore
+            cla += r_cla
+            obs += r_obs
+            geo += r_geo
+            minute += 1
+
+            nscore = -r_geo
+
+            if not can_build:
+                heappush(
+                    q,
+                    (
+                        nscore,
+                        minute,
+                        (r_ore, r_cla, r_obs, r_geo),
+                        (ore, cla, obs, geo),
+                        set(),
+                    ),
+                )
+                continue
+
+            if "geo" in can_build:
+                # Always build geo if possible
+                can_build = {"geo"}
+
+            if can_build == ignore:
+                heappush(
+                    q,
+                    (
+                        nscore,
+                        minute,
+                        (r_ore, r_cla, r_obs, r_geo),
+                        (ore, cla, obs, geo),
+                        ignore,
+                    ),
+                )
+
             for rtype in can_build:
-                if rtype == 'ore':
+                if rtype == "ore":
+                    if r_ore == max_ore:
+                        # don't build more than we need!
+                        continue
+                    if r_obs > 0:
+                        # once we are building obs it is too late to build more
+                        continue
                     o, c, ob = bp[0]
-                    heappush(q, (-(r_ore + r_clay + r_obs + 2*r_geode), minute + 1, (r_ore +1, r_clay, r_obs, r_geode), (ore-o, clay-c, obs-ob, geode), copy.copy(nstate), []))
-                elif rtype == 'clay':
+                    heappush(
+                        q,
+                        (
+                            nscore,
+                            minute,
+                            (r_ore + 1, r_cla, r_obs, r_geo),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                elif rtype == "cla":
+                    if r_cla == max_cla:
+                        # don't build more than we need!
+                        continue
                     o, c, ob = bp[1]
-                    heappush(q, (-(r_ore + r_clay + r_obs + 2*r_geode), minute + 1, (r_ore, r_clay+1, r_obs, r_geode), (ore-o, clay-c, obs-ob, geode), copy.copy(nstate),[]))
-                elif rtype == 'obs':
+                    heappush(
+                        q,
+                        (
+                            nscore,
+                            minute,
+                            (r_ore, r_cla + 1, r_obs, r_geo),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                elif rtype == "obs":
+                    if r_obs == max_obs:
+                        # don't build more than we need!
+                        continue
                     o, c, ob = bp[2]
-                    heappush(q, (-(r_ore + r_clay + r_obs + 2*r_geode), minute + 1, (r_ore, r_clay, r_obs+1, r_geode), (ore-o, clay-c, obs-ob, geode), copy.copy(nstate),[]))
-                elif rtype == 'geode':
+                    heappush(
+                        q,
+                        (
+                            nscore,
+                            minute,
+                            (r_ore, r_cla, r_obs + 1, r_geo),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                elif rtype == "geo":
                     o, c, ob = bp[3]
-                    heappush(q, (-(r_ore + r_clay + r_obs + 2*r_geode), minute + 1, (r_ore, r_clay, r_obs, r_geode+1), (ore-o, clay-c, obs-ob, geode), copy.copy(nstate),[]))
+                    heappush(
+                        q,
+                        (
+                            nscore,
+                            minute,
+                            (r_ore, r_cla, r_obs, r_geo + 1),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
                 else:
                     assert False
-        heappush(q, (-(r_ore + r_clay + r_obs + 2*r_geode), minute + 1, (r_ore, r_clay, r_obs, r_geode), (ore, clay, obs, geode), copy.copy(nstate), can_build))
 
-    RESULTS[num] = result
-    print(num, result)
-print(RESULTS)
-result = 0
-for k, v in RESULTS.items():
-    result += k * v
-# Part 1 = 
-print(f"answer = {result}")
+            # If can build anything then must build something
+            if len(can_build) == 4:
+                continue
+            else:
+                # We can choose not to build anything
+                heappush(
+                    q,
+                    (
+                        nscore,
+                        minute,
+                        (r_ore, r_cla, r_obs, r_geo),
+                        (ore, cla, obs, geo),
+                        can_build,
+                    ),
+                )
 
-result = 0
+        RESULTS[num] = result
+        print(num, result)
 
-# Part 2 = 
-print(f"answer = {result}")
+    if not part_2:
+        result = 0
+        for k, v in RESULTS.items():
+            result += k * v
+        return result
+    else:
+        result = 1
+        for v in RESULTS.values():
+            result *= v
+        return result
+
+
+# Part 1 = 1616
+print(f"answer = {solve()}")
+
+# Part 2 = 8990
+print(f"answer = {solve(True)}")

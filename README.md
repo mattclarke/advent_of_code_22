@@ -114,8 +114,8 @@ An alternative would have been to record the top ~30 rows after each rock and se
 - Part 2: surround the area with 'water' and for any cube that touches water fill that one. Repeat until water has got every where it can, then count the rock sides that touch water.
 
 ## Day 19
-- Part 1: .
-- Part 2: .
+- Part 1: use a heapq to queue all the "choices" and then work through them. Using a number of tricks to skip branches, such as bailing if the same state has been achieving in a quicker time, don't build more robots than we need, etc. Still pretty slow at ~6 minutes with pypy.
+- Part 2: adjusted to new rules. Takes ~15 minutes to complete. Will try to speed it up.
 
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
