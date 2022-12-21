@@ -20,101 +20,182 @@ for i, l in enumerate(lines):
     clay = (int(parts[12]), 0, 0)
     obs = (int(parts[18]), int(parts[21]), 0)
     geode = (int(parts[27]), 0, int(parts[30]))
-    BLUEPRINTS[i+1] = (ore, clay, obs, geode) 
-
-RESULTS = {}
+    BLUEPRINTS[i + 1] = (ore, clay, obs, geode)
 
 
+def solve(part_2=False):
+    RESULTS = {}
+    num_minutes = 32 if part_2 else 24
 
-for num, bp in BLUEPRINTS.items():
-    q = [(-1,1, (1, 0, 0, 0), (0,0,0,0), set())]
-    BEST = {}
-    result = 0
-    max_ore = max(bp[0][0], bp[1][0], bp[2][0], bp[3][0])
-    max_cla = max(bp[0][1], bp[1][1], bp[2][1], bp[3][1])
-    max_obs = max(bp[0][2], bp[1][2], bp[2][2], bp[3][2])
+    for num, bp in BLUEPRINTS.items():
+        if part_2 and num > 3:
+            break
 
-    while q:
-        score, minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo), ignore = heappop(q)
+        q = [(-1, 1, (1, 0, 0, 0), (0, 0, 0, 0), set())]
+        BEST = {}
+        result = 0
+        max_ore = max(bp[0][0], bp[1][0], bp[2][0], bp[3][0])
+        max_cla = max(bp[0][1], bp[1][1], bp[2][1], bp[3][1])
+        max_obs = max(bp[0][2], bp[1][2], bp[2][2], bp[3][2])
 
-        if minute > 32:
-            result = max(result, geo)
-            print(result)
-            continue
+        while q:
+            (
+                score,
+                minute,
+                (r_ore, r_cla, r_obs, r_geo),
+                (ore, cla, obs, geo),
+                ignore,
+            ) = heappop(q)
 
-        if (minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo)) in BEST:
-            continue
-        BEST[(minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] = 0
+            if minute > num_minutes:
+                if geo > result:
+                    print(result, len(q))
+                result = max(result, geo)
+                continue
 
-        can_build = set()
-        for rp, rtype in zip(bp, ['ore', 'cla', 'obs', 'geo']):
-            if ore >= rp[0] and cla >= rp[1] and obs >= rp[2]:
-                can_build.add(rtype)
+            if (minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo)) in BEST:
+                continue
+            BEST[(minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] = 0
 
-        ore += r_ore
-        cla += r_cla
-        obs += r_obs
-        geo += r_geo
+            can_build = set()
+            for rp, rtype in zip(bp, ["ore", "cla", "obs", "geo"]):
+                if ore >= rp[0] and cla >= rp[1] and obs >= rp[2]:
+                    can_build.add(rtype)
 
-        #print(minute, r_ore, r_cla, r_obs, r_geo, ore, cla, obs, geo, can_build)
-        #print(len(q))
-        minute += 1
-        #input()
+            ore += r_ore
+            cla += r_cla
+            obs += r_obs
+            geo += r_geo
 
-        if not can_build:
-            heappush(q, (-(r_geo), minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo), set()))
-            continue
+            # print(minute, r_ore, r_cla, r_obs, r_geo, ore, cla, obs, geo, can_build)
+            # print(len(q))
+            minute += 1
+            # input()
 
-        if can_build == ignore:
-            heappush(q, (-(r_geo), minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo), ignore))
-        
-        for rtype in can_build:
-            if rtype == 'ore':
-                if r_ore == max_ore:
-                    # don't build more than we need!
-                    continue
-                if r_obs > 0:
-                   # once we are building obs it is too late to build more
-                   continue
-                o, c, ob = bp[0]
-                heappush(q, (-(r_geo), minute, (r_ore+1, r_cla, r_obs, r_geo), (ore-o, cla-c, obs-ob, geo), set()))
-            elif rtype == 'cla':
-                if r_cla == max_cla:
-                    # don't build more than we need!
-                    continue
-                o, c, ob = bp[1]
-                heappush(q, (-(r_geo), minute, (r_ore, r_cla+1, r_obs, r_geo), (ore-o, cla-c, obs-ob, geo), set()))
-            elif rtype == 'obs':
-                if r_obs == max_obs:
-                    # don't build more than we need!
-                    continue
-                o, c, ob = bp[2]
-                heappush(q, (-(r_geo), minute, (r_ore, r_cla, r_obs+1, r_geo), (ore-o, cla-c, obs-ob, geo), set()))
-            elif rtype == 'geo':
-                o, c, ob = bp[3]
-                heappush(q, (-(r_geo), minute, (r_ore, r_cla, r_obs, r_geo+1), (ore-o, cla-c, obs-ob, geo), set()))
+            if not can_build:
+                heappush(
+                    q,
+                    (
+                        -(r_geo),
+                        minute,
+                        (r_ore, r_cla, r_obs, r_geo),
+                        (ore, cla, obs, geo),
+                        set(),
+                    ),
+                )
+                continue
+
+            if can_build == ignore:
+                heappush(
+                    q,
+                    (
+                        -(r_geo),
+                        minute,
+                        (r_ore, r_cla, r_obs, r_geo),
+                        (ore, cla, obs, geo),
+                        ignore,
+                    ),
+                )
+
+            for rtype in can_build:
+                if rtype == "ore":
+                    if r_ore == max_ore:
+                        # don't build more than we need!
+                        continue
+                    if r_obs > 0:
+                        # once we are building obs it is too late to build more
+                        continue
+                    o, c, ob = bp[0]
+                    heappush(
+                        q,
+                        (
+                            -(r_geo),
+                            minute,
+                            (r_ore + 1, r_cla, r_obs, r_geo),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                elif rtype == "cla":
+                    if r_cla == max_cla:
+                        # don't build more than we need!
+                        continue
+                    o, c, ob = bp[1]
+                    heappush(
+                        q,
+                        (
+                            -(r_geo),
+                            minute,
+                            (r_ore, r_cla + 1, r_obs, r_geo),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                elif rtype == "obs":
+                    if r_obs == max_obs:
+                        # don't build more than we need!
+                        continue
+                    o, c, ob = bp[2]
+                    heappush(
+                        q,
+                        (
+                            -(r_geo),
+                            minute,
+                            (r_ore, r_cla, r_obs + 1, r_geo),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                elif rtype == "geo":
+                    o, c, ob = bp[3]
+                    heappush(
+                        q,
+                        (
+                            -(r_geo),
+                            minute,
+                            (r_ore, r_cla, r_obs, r_geo + 1),
+                            (ore - o, cla - c, obs - ob, geo),
+                            set(),
+                        ),
+                    )
+                else:
+                    assert False
+
+            # If can build anything then must build something
+            if len(can_build) == 4:
+                continue
             else:
-                assert False
+                # Don't forget we can not build too
+                heappush(
+                    q,
+                    (
+                        -(r_geo),
+                        minute,
+                        (r_ore, r_cla, r_obs, r_geo),
+                        (ore, cla, obs, geo),
+                        can_build,
+                    ),
+                )
 
-        # If can build anything then must build something
-        if len(can_build) == 4:
-            continue
-        else:
-            # Don't forget we can not build too
-            heappush(q, (-(r_geo), minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo), can_build))
+        RESULTS[num] = result
+        print(num, result)
 
-    RESULTS[num] = result
-    print(num, result)
-    break
-print(RESULTS)
-result = 0
-for k, v in RESULTS.items():
-    result += k * v
+    if not part_2:
+        result = 0
+        for k, v in RESULTS.items():
+            result += k * v
+        return result
+    else:
+        result = 1
+        for v in RESULTS.values():
+            result *= v
+        return result
+
 
 # Part 1 = 1616
-print(f"answer = {result}")
+print(f"answer = {solve()}")
 
 result = 0
 
-# Part 2 = 8990 
+# Part 2 = 8990
 print(f"answer = {result}")
