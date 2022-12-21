@@ -53,9 +53,10 @@ def solve(part_2=False):
                 result = max(result, geo)
                 continue
 
-            if (minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo)) in BEST:
-                continue
-            BEST[(minute, (r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] = 0
+            if ((r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo)) in BEST:
+                if BEST[((r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] <= minute:
+                    continue
+            BEST[((r_ore, r_cla, r_obs, r_geo), (ore, cla, obs, geo))] = minute
 
             can_build = set()
             for rp, rtype in zip(bp, ["ore", "cla", "obs", "geo"]):
@@ -84,6 +85,10 @@ def solve(part_2=False):
                     ),
                 )
                 continue
+
+            if "geo" in can_build:
+                # Always build geo if possible
+                can_build = {'geo'}
 
             if can_build == ignore:
                 heappush(
