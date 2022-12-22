@@ -1,7 +1,7 @@
 import copy
 import sys
 
-from heapq import heappush, heappop
+from collections import deque
 
 FILE = sys.argv[1] if len(sys.argv) > 1 else "input.txt"
 
@@ -30,8 +30,8 @@ def solve(part_2=False):
     for num, bp in BLUEPRINTS.items():
         if part_2 and num > 3:
             break
-
-        q = [(-1, 1, (1, 0, 0, 0), (0, 0, 0, 0), set())]
+        
+        q = deque([(-1, 1, (1, 0, 0, 0), (0, 0, 0, 0), set())])
         BEST = {}
         result = 0
         max_ore = max(bp[0][0], bp[1][0], bp[2][0], bp[3][0])
@@ -45,7 +45,7 @@ def solve(part_2=False):
                 (r_ore, r_cla, r_obs, r_geo),
                 (ore, cla, obs, geo),
                 ignore,
-            ) = heappop(q)
+            ) = q.popleft()
 
             if minute > num_minutes:
                 if geo > result:
@@ -72,15 +72,14 @@ def solve(part_2=False):
             nscore = -minute
 
             if not can_build:
-                heappush(
-                    q,
+                q.append(
                     (
                         nscore,
                         minute,
                         (r_ore, r_cla, r_obs, r_geo),
                         (ore, cla, obs, geo),
                         set(),
-                    ),
+                    )
                 )
                 continue
 
@@ -89,15 +88,14 @@ def solve(part_2=False):
                 can_build = {"geo"}
 
             if can_build == ignore:
-                heappush(
-                    q,
+                q.append(
                     (
                         nscore,
                         minute,
                         (r_ore, r_cla, r_obs, r_geo),
                         (ore, cla, obs, geo),
                         ignore,
-                    ),
+                    )
                 )
 
             for rtype in can_build:
@@ -109,57 +107,53 @@ def solve(part_2=False):
                         # once we are building obs it is too late to build more
                         continue
                     o, c, ob = bp[0]
-                    heappush(
-                        q,
+                    q.append(
                         (
                             nscore,
                             minute,
                             (r_ore + 1, r_cla, r_obs, r_geo),
                             (ore - o, cla - c, obs - ob, geo),
                             set(),
-                        ),
+                        )
                     )
                 elif rtype == "cla":
                     if r_cla == max_cla:
                         # don't build more than we need!
                         continue
                     o, c, ob = bp[1]
-                    heappush(
-                        q,
+                    q.append(
                         (
                             nscore,
                             minute,
                             (r_ore, r_cla + 1, r_obs, r_geo),
                             (ore - o, cla - c, obs - ob, geo),
                             set(),
-                        ),
+                        )
                     )
                 elif rtype == "obs":
                     if r_obs == max_obs:
                         # don't build more than we need!
                         continue
                     o, c, ob = bp[2]
-                    heappush(
-                        q,
+                    q.append(
                         (
                             nscore,
                             minute,
                             (r_ore, r_cla, r_obs + 1, r_geo),
                             (ore - o, cla - c, obs - ob, geo),
                             set(),
-                        ),
+                        )
                     )
                 elif rtype == "geo":
                     o, c, ob = bp[3]
-                    heappush(
-                        q,
+                    q.append(
                         (
                             nscore,
                             minute,
                             (r_ore, r_cla, r_obs, r_geo + 1),
                             (ore - o, cla - c, obs - ob, geo),
                             set(),
-                        ),
+                        )
                     )
                 else:
                     assert False
@@ -169,15 +163,14 @@ def solve(part_2=False):
                 continue
             else:
                 # We can choose not to build anything
-                heappush(
-                    q,
+                q.append(
                     (
                         nscore,
                         minute,
                         (r_ore, r_cla, r_obs, r_geo),
                         (ore, cla, obs, geo),
                         can_build,
-                    ),
+                    )
                 )
 
         RESULTS[num] = result

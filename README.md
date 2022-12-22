@@ -119,6 +119,7 @@ An alternative would have been to record the top ~30 rows after each rock and se
 
 Update:
 - replacing the "score" with `minutes` rather than `r_geo` brings the times down to ~175s and ~700s. Using `minutes` is almost the same as doing a DFS? 
+- Using a regular deque instead of a heapq reduces the times down to ~52 seconds and ~270 seconds.
 
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
