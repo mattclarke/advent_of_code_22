@@ -30,7 +30,7 @@ def solve(part_2=False):
     for num, bp in BLUEPRINTS.items():
         if part_2 and num > 3:
             break
-        
+
         q = deque([(-1, 1, (1, 0, 0, 0), (0, 0, 0, 0), set())])
         BEST = {}
         result = 0
@@ -146,7 +146,7 @@ def solve(part_2=False):
                     )
                 elif rtype == "geo":
                     o, c, ob = bp[3]
-                    q.append(
+                    q.appendleft(
                         (
                             nscore,
                             minute,
