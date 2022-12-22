@@ -128,3 +128,7 @@ Update:
 - Part 1: implement the algorithm as described.
 - Part 2: apply the modifications and then binary search for the correct value. Initially, I did it by hand because I am lazy!
 
+## Day 22
+- Part 1: implement the instructions. To make it easier to deal with the wrapping I padded the rows to the same length, so the map is rectangular.
+- Part 2: the hard bit is working out how the faces join together and how that affects the row, column and direction when moving faces. I spent a lot of time looking at a cube with numbers written on it! Not sure how to make the solution general.
+
