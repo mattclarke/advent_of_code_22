@@ -138,3 +138,6 @@ Update:
 ## Day 23
 - Part 1: implement the algorithm. I had to do two passes, one to find the positions where two or more elves wanted to move to and one to do the moves if allowed. Can the duplication be reduced?
 - Part 2: same thing, but count the elves that don't move and when that number equals the total number of elves return the round number.
+
+Update:
+- refactored to reduce the duplication by using a defaultdict. Simplies part 2 too.
