@@ -98,10 +98,12 @@ while True:
     elves = set()
     for new, olds in new_to_old.items():
         if len(olds) == 1:
+            # Only elf going to or staying at that position
             if new != olds[0]:
                 no_moves = False
             elves.add(new)
         else:
+            # 2+ elves going to the same square, so they all stay at their old positions
             elves.update(olds)
     if no_moves:
         result_2 = round_num
