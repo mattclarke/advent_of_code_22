@@ -122,6 +122,7 @@ Update:
 - Using a regular deque instead of a heapq reduces the times down to ~52 seconds and ~270 seconds.
 - Using `appendleft` when building a geode robot reduces the times a little (~47s and ~230s). Internet tip!
 - Last minute will produce the same number of geodes as the previous minute, so can just add `r_geode` and exit (~35s and 130s). Internet tip!
+- Throw away any materials we cannot spend in the remaining time. This reduces the number of different states, so we are more likely to hit the cache for major speed increases (~14s and ~40s!). Internet tip!
 
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.

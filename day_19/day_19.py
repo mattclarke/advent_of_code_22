@@ -69,6 +69,15 @@ def solve(part_2=False):
             cla += r_cla
             obs += r_obs
             geo += r_geo
+
+            # Throw away any excess materials if we have more
+            # than we can spend.
+            # This reduces the number of states so we are more
+            # likely to hit the cache
+            ore = min(ore, max_obs * (num_minutes - minute))
+            cla = min(cla, max_cla * (num_minutes - minute))
+            obs = min(obs, max_obs * (num_minutes - minute))
+
             minute += 1
 
             nscore = -minute
