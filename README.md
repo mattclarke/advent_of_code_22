@@ -134,3 +134,6 @@ Update:
 - Part 1: implement the instructions. To make it easier to deal with the wrapping I padded the rows to the same length, so the map is rectangular.
 - Part 2: the hard bit is working out how the faces join together and how that affects the row, column and direction when moving faces. I spent a lot of time looking at a cube with numbers written on it! Not sure how to make the solution general.
 
+## Day 23
+- Part 1: implement the algorithm. I had to do two passes, one to find the positions where two or more elves wanted to move to and one to do the moves if allowed. Can the duplication be reduced?
+- Part 2: same thing, but count the elves that don't move and when that number equals the total number of elves return the round number.
