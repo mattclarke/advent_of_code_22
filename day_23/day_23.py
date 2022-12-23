@@ -60,36 +60,44 @@ while True:
         moved = False
         for dd in dir_:
             if dd == "n":
-                d1 = (e[0] - 1, e[1])
-                d2 = (e[0] - 1, e[1] + 1)
-                d3 = (e[0] - 1, e[1] - 1)
-                if d1 not in elves and d2 not in elves and d3 not in elves:
+                d = (e[0] - 1, e[1])
+                if (
+                    d not in elves
+                    and (d[0], d[1] + 1) not in elves
+                    and (d[0], d[1] - 1) not in elves
+                ):
                     moved = True
-                    new_to_old[d1].append(e)
+                    new_to_old[d].append(e)
                     break
             elif dd == "s":
-                d1 = (e[0] + 1, e[1])
-                d2 = (e[0] + 1, e[1] + 1)
-                d3 = (e[0] + 1, e[1] - 1)
-                if d1 not in elves and d2 not in elves and d3 not in elves:
+                d = (e[0] + 1, e[1])
+                if (
+                    d not in elves
+                    and (d[0], d[1] + 1) not in elves
+                    and (d[0], d[1] - 1) not in elves
+                ):
                     moved = True
-                    new_to_old[d1].append(e)
+                    new_to_old[d].append(e)
                     break
             elif dd == "w":
-                d1 = (e[0], e[1] - 1)
-                d2 = (e[0] + 1, e[1] - 1)
-                d3 = (e[0] - 1, e[1] - 1)
-                if d1 not in elves and d2 not in elves and d3 not in elves:
+                d = (e[0], e[1] - 1)
+                if (
+                    d not in elves
+                    and (d[0] + 1, d[1]) not in elves
+                    and (d[0] - 1, d[1]) not in elves
+                ):
                     moved = True
-                    new_to_old[d1].append(e)
+                    new_to_old[d].append(e)
                     break
             elif dd == "e":
-                d1 = (e[0], e[1] + 1)
-                d2 = (e[0] + 1, e[1] + 1)
-                d3 = (e[0] - 1, e[1] + 1)
-                if d1 not in elves and d2 not in elves and d3 not in elves:
+                d = (e[0], e[1] + 1)
+                if (
+                    d not in elves
+                    and (d[0] + 1, d[1]) not in elves
+                    and (d[0] - 1, d[1]) not in elves
+                ):
                     moved = True
-                    new_to_old[d1].append(e)
+                    new_to_old[d].append(e)
                     break
         if not moved:
             new_to_old[e].append(e)
