@@ -121,6 +121,7 @@ Update:
 - replacing the "score" with `minutes` rather than `r_geo` brings the times down to ~175s and ~700s. Using `minutes` is almost the same as doing a DFS? 
 - Using a regular deque instead of a heapq reduces the times down to ~52 seconds and ~270 seconds.
 - Using `appendleft` when building a geode robot reduces the times a little (~47s and ~230s). Internet tip!
+- Last minute will produce the same number of geodes as the previous minute, so can just add `r_geode` and exit (~35s and 130s). Internet tip!
 
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
