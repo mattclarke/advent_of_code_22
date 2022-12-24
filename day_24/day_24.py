@@ -84,13 +84,16 @@ def update_winds(winds):
 
 D = [(1, 0),(0, -1), (0, 1), (-1,0)]  
 pos = START
-result_wind = []
 
 def calc_score(pos, tgt):
-   return (tgt[0] - pos[0] + tgt[1] - pos[1])
+    if tgt == END:
+        return (tgt[0] - pos[0] + tgt[1] - pos[1])
+    else:
+        return -(tgt[0] - pos[0] + tgt[1] - pos[1])
 
 def solve(start, end, winds):
     result = 100000000000000000
+    result_wind = []
     q = [((calc_score(start, end), 0), 0, start, copy.deepcopy(winds))] 
     SEEN = set()
     while q:
@@ -109,7 +112,7 @@ def solve(start, end, winds):
         home = False
         for dr, dc in D:
             npos = (pos[0]+dr, pos[1]+dc)
-            if npos[0] < 0 or npos[0] > len(GRID) or npos[1] < 0 or npos[1] > len(GRID[0]):
+            if npos[0] < 0 or npos[0] > len(GRID)-1 or npos[1] < 0 or npos[1] > len(GRID[0]):
                 continue
             if npos == end:
                 home = True
@@ -131,14 +134,20 @@ def solve(start, end, winds):
             # cannot stay put
             continue
         heappush(q, ((calc_score(pos, end), -minute), minute + 1, pos, copy.deepcopy(winds)))
-    return result
+    return result, result_wind
 
-result = solve(START, END, winds)
+one_way, winds = solve(START, END, winds)
+print(winds)
 
-# Part 1 = 
-print(f"answer = {result}")
+# Part 1 = 242
+print(f"answer = {one_way}")
 
+back_to_start, winds = solve(END, START, winds) 
+print(back_to_start)
+print(winds) 
 
+and_to_end, winds = solve(START, END, winds)
+print(and_to_end)
 
 # Part 2 = 
-print(f"answer = {result}")
+print(f"answer = {one_way + back_to_start + and_to_end}")
