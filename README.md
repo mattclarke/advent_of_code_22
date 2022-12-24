@@ -144,5 +144,5 @@ Update:
 - refactored to reduce the duplication by using a defaultdict. Simplies part 2 too.
 
 ## Day 21
-- Part 1: implemented the algorithm using heapq. Despite some branch trimming it is slow (~460s).
+- Part 1: implemented the algorithm using heapq. Despite some branch trimming it is slow (~8 minutes).
 - Part 2: basically runs the algorithm three times. Very slow at ~28 minutes!  
