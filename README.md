@@ -146,3 +146,6 @@ Update:
 ## Day 21
 - Part 1: implemented the algorithm using heapq. Despite some branch trimming it is slow (~8 minutes).
 - Part 2: basically runs the algorithm three times. Very slow at ~28 minutes!  
+
+Update:
+- remove unnecessary copying brings part 1 down to <3 minutes and part 2 down to <11 minutes.
