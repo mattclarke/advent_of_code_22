@@ -84,55 +84,61 @@ def update_winds(winds):
 
 D = [(1, 0),(0, -1), (0, 1), (-1,0)]  
 pos = START
-q = [((END[0] - pos[0] + END[1] - pos[1], 0), 0, pos, copy.deepcopy(winds))] 
-result = 100000000000000000
-SEEN = set()
+result_wind = []
 
-def calc_score(pos):
-   return (END[0] - npos[0] + END[1] - npos[1])
+def calc_score(pos, tgt):
+   return (tgt[0] - pos[0] + tgt[1] - pos[1])
 
-while q:
-    #print(len(q), len(SEEN))
-    score, minute, pos, winds = heappop(q)
-    if minute >= result:
-        continue
-    if (minute, pos, frozenset(winds)) in SEEN:
-        continue
-    SEEN.add((minute, pos, frozenset(winds)))
-    #print(score, minute, pos, winds)
-    #show(GRID, winds, pos)
-    #input()
-    winds, wind_squares = update_winds(winds)
-    home = False
-    for dr, dc in D:
-        npos = (pos[0]+dr, pos[1]+dc)
-        if npos[0] < 0 or npos[0] > len(GRID) or npos[1] < 0 or npos[1] > len(GRID[0]):
+def solve(start, end, winds):
+    result = 100000000000000000
+    q = [((calc_score(start, end), 0), 0, start, copy.deepcopy(winds))] 
+    SEEN = set()
+    while q:
+        score, minute, pos, winds = heappop(q)
+        if minute >= result:
             continue
-        if npos == END:
-            home = True
-            break
-        elif npos in wind_squares:
+        if minute + calc_score(pos, end) >= result:
             continue
-        elif GRID[npos[0]][npos[1]] == '.':
-            if minute + 1 >= result:
+        if (minute, pos, frozenset(winds)) in SEEN:
+            continue
+        SEEN.add((minute, pos, frozenset(winds)))
+        #print(score, minute, pos, winds)
+        #show(GRID, winds, pos)
+        #input()
+        winds, wind_squares = update_winds(winds)
+        home = False
+        for dr, dc in D:
+            npos = (pos[0]+dr, pos[1]+dc)
+            if npos[0] < 0 or npos[0] > len(GRID) or npos[1] < 0 or npos[1] > len(GRID[0]):
                 continue
-            heappush(q, ((calc_score(npos), -minute), minute + 1, npos, copy.deepcopy(winds)))
-    if home:
-        result = min(result, minute +1)
-        print(result, len(q))
-        continue
-    # wait
-    if pos in wind_squares:
-        # cannot stay put
-        continue
-    heappush(q, ((calc_score(pos), -minute), minute + 1, pos, copy.deepcopy(winds)))
+            if npos == end:
+                home = True
+                break
+            elif npos in wind_squares:
+                continue
+            elif GRID[npos[0]][npos[1]] == '.':
+                if minute + 1 >= result:
+                    continue
+                heappush(q, ((calc_score(npos, end), -minute), minute + 1, npos, copy.deepcopy(winds)))
+        if home:
+            if minute + 1 < result:
+                result = min(result, minute +1)
+                result_wind = winds
+            print(result, len(q))
+            continue
+        # wait
+        if pos in wind_squares:
+            # cannot stay put
+            continue
+        heappush(q, ((calc_score(pos, end), -minute), minute + 1, pos, copy.deepcopy(winds)))
+    return result
 
-    
+result = solve(START, END, winds)
 
 # Part 1 = 
 print(f"answer = {result}")
 
-result = 0
+
 
 # Part 2 = 
 print(f"answer = {result}")
