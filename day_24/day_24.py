@@ -85,29 +85,26 @@ def update_winds(winds):
 D = [(1, 0),(0, -1), (0, 1), (-1,0)]  
 pos = START
 
-def calc_score(pos, tgt):
+def calc_manhatten(pos, tgt):
     if tgt == END:
-        return (tgt[0] - pos[0] + tgt[1] - pos[1])
+        return tgt[0] - pos[0] + tgt[1] - pos[1]
     else:
-        return -(tgt[0] - pos[0] + tgt[1] - pos[1])
+        return pos[0] - tgt[0] + pos[1] - tgt[1]
 
 def solve(start, end, winds):
     result = 100000000000000000
     result_wind = []
-    q = [((calc_score(start, end), 0), 0, start, copy.deepcopy(winds))] 
+    q = [((calc_manhatten(start, end), 0), 0, start, copy.deepcopy(winds))] 
     SEEN = set()
     while q:
         score, minute, pos, winds = heappop(q)
         if minute >= result:
             continue
-        if minute + calc_score(pos, end) >= result:
+        if minute + calc_manhatten(pos, end) >= result:
             continue
         if (minute, pos, frozenset(winds)) in SEEN:
             continue
         SEEN.add((minute, pos, frozenset(winds)))
-        #print(score, minute, pos, winds)
-        #show(GRID, winds, pos)
-        #input()
         winds, wind_squares = update_winds(winds)
         home = False
         for dr, dc in D:
@@ -122,7 +119,7 @@ def solve(start, end, winds):
             elif GRID[npos[0]][npos[1]] == '.':
                 if minute + 1 >= result:
                     continue
-                heappush(q, ((calc_score(npos, end), -minute), minute + 1, npos, copy.deepcopy(winds)))
+                heappush(q, ((calc_manhatten(npos, end), -minute), minute + 1, npos, copy.deepcopy(winds)))
         if home:
             if minute + 1 < result:
                 result = min(result, minute +1)
@@ -133,21 +130,16 @@ def solve(start, end, winds):
         if pos in wind_squares:
             # cannot stay put
             continue
-        heappush(q, ((calc_score(pos, end), -minute), minute + 1, pos, copy.deepcopy(winds)))
+        heappush(q, ((calc_manhatten(pos, end), -minute), minute + 1, pos, copy.deepcopy(winds)))
     return result, result_wind
 
 one_way, winds = solve(START, END, winds)
-print(winds)
 
 # Part 1 = 242
 print(f"answer = {one_way}")
 
 back_to_start, winds = solve(END, START, winds) 
-print(back_to_start)
-print(winds) 
-
 and_to_end, winds = solve(START, END, winds)
-print(and_to_end)
 
-# Part 2 = 
+# Part 2 = 720
 print(f"answer = {one_way + back_to_start + and_to_end}")
