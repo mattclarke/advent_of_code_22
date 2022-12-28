@@ -9,6 +9,8 @@ with open(FILE) as f:
 
 lines = [line.strip() for line in PUZZLE_INPUT.split("\n") if line]
 
+str_to_num = {"2": 2, "1":1, "0": 0, "-": -1, "=": -2}
+num_to_str = {2: '2', 1:'1', 0: '0', -1: '-', -2: '='}
 fives = [5**x for x in range(20)]
 maxs = []
 
@@ -70,6 +72,12 @@ def find_digit(target, i):
             return (-2, f, i) if is_neg else (2, f, i)
     return 0, f, i
 
+def to_snafu(dec):
+    start = None
+    for i, mn, mx in enumerate(zip(maxs[:-1], maxs[1:])):
+        if mn < target <= mx:
+            start = i
+            break
 
 target = total
 so_far = []
@@ -87,52 +95,9 @@ so_far.append(target)
 
 result = ""
 for x in so_far:
-    if x == 2:
-        result += "2"
-    elif x == 1:
-        result += "1"
-    elif x == 0:
-        result += "0"
-    elif x == -1:
-        result += "-"
-    elif x == -2:
-        result += "="
-    else:
-        assert False
+    result += (num_to_str[x])
 
 assert to_dec(result) == total
 
-# def find_digit(target, base):
-#    max_f = 0
-#    for i, f5 in enumerate(fives):
-#        if target < f5:
-#            max_f = i-1
-#
-#    mu =[-2, -1, 0, 1, 2]:
-#    for i in range(len(mu)-1):
-#        low = fives[max_f] * mu[i]
-#        hgh = fives[max_f] * mu[i+1]
-#        mid = fives[max_f] * mu[i+1]
-#        for x in range(max_f):
-#            low += fives[x] * -2
-#            hgh += fives[x] * -2
-#            mid =
-#
-#
-#    for i, f5 in enumerate(fives):
-#       mx = f5 * 2
-#       mxm = f5 * 2
-#       mn = f5
-#       for x in range(i):
-#           mx += fives[x] * 2
-#           mxm += fives[x] * -2
-#           mn += fives[x] * -2
-#       if mn <= total <= mx:
-#           print(f5, mn, mx, mxm)
-#           if total >= mxm:
-#               print('starts with a two')
-#           else:
-#               print('starts with a one')
-#
 # Part 1 = 2-121-=10=200==2==21
 print(f"answer = {result}")
