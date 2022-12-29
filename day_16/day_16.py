@@ -87,7 +87,7 @@ while q:
     # arrangment is the optimal configuration.
     # Saves a lot of time as we can skip many configurations.
     if len(state) > 4:
-        mn = 30 + minute if is_elep else minute
+        mn = 26 + minute if is_elep else minute
         if press > best.get((mn, frozenset(state)), 0):
             continue
         best[(mn, frozenset(state))] = press
