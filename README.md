@@ -150,6 +150,31 @@ Update:
 Update:
 - remove unnecessary copying brings part 1 down to <3 minutes and part 2 down to <11 minutes.
 
-## Day 24
+## Day 25
 - Part 1: converting numbers to and from a weird base 5. Took me a while to work out how to convert back to decimal.
 - Part 2: no part 2!
+
+Update:
+- Internet example shows that it can be done in a more "traditional" way. Normally converting from a decimal to another base can be done like so:
+```
+result = []
+
+while target != 0:
+    target, d = divmod(target, 5)
+    # insert as we are starting with the least significant
+    result.insert(0, d)
+
+```
+- However, for this task the digits can only range from -2 to 2. Therefore, if the modulo is greater than 2 it can be brought back into range by subtracting -5. When this happens we "carry" one to the next digit:
+```
+decimal is 38
+divmod by 5 gives 7 and a remainder of 3
+3 is greater than 2 so we subtract 5 giving -2 and a carry
+
+divmod by 5 of 7 gives 1 and a remainder of 2
+but as there was a carry the remainder becomes 3
+3 is greater than 2 so we subtract 5 giving -2 and a carry
+
+finally, divmod by 5 of 1 gives 0 and a remainder of 1
+add the carry gives 2, so the final answer is '2, -2, -2'
+```

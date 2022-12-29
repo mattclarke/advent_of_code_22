@@ -67,3 +67,21 @@ assert to_dec(result) == total
 
 # Part 1 = 2-121-=10=200==2==21
 print(f"answer = {result}")
+
+
+def to_snafu(target):
+    """Internet solution"""
+    result = ""
+    carry = 0
+    while target != 0:
+        target, m = divmod(target, 5)
+        m += carry
+        if m > 2:
+            result = num_to_str[m - 5] + result
+            carry = 1
+        else:
+            result = num_to_str[m] + result
+            carry = 0
+    return result
+
+print(to_snafu(38))
