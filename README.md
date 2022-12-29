@@ -99,9 +99,12 @@ Consider 17 and 19:
 - Part 1: used a heapq to prioritise the most promising solutions.
 - Part 2: took many many hours. Rewrote part 1 to try to optimise the solutions. Reduced the nodes down to only those that can be opened and calculated the distance to all other nodes. Lots of ifs, so was a bit buggy. Getting the right answer the first time took ~10 minutes, but with some pruning managed to get it down to ~70 seconds (pypy). Would like to make it a bit neater!
 
-UPDATE: realised that there was **no reason to do both in parallel**: I can do all my moves first then switch to the elephant. This only requires a small modification to the solution to part 1 to switch to the elephant when there is no more options in range for me. Much less confusing logic. Also added tracking of best values to speed it up. Takes less than 20 seconds to run.
+Update: 
+- I realised that there was **no reason to do both in parallel**: I can do all my moves first then switch to the elephant. This only requires a small modification to the solution to part 1 to switch to the elephant when there is no more options in range for me. Much less confusing logic. Also added tracking of best values to speed it up. Takes less than 20 seconds to run.
 
 Note: it doesn't work for the example because I can open all the valves before changing to the elephant.
+
+- Interleaved the moves of me and the elephant, so now it works for the example too.
 
 ## Day 17
 - Part 1: implement the "game" - took me a while to do this!

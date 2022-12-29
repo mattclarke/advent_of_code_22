@@ -78,45 +78,46 @@ print(f"answer = {-result}")
 
 result = 0
 q = []
-heappush(q, (0, 0, 1, "AA", [], 0, False))
+heappush(q, (0, (1, "AA"), (1, "AA"), set(), False))
 best = {}
+seen = set()
 
 while q:
-    press, toadd, minute, curr, state, dist, is_elep = heappop(q)
+    press, me, elep, state, is_elep = heappop(q)
+    if me[0] >= 26 and elep[0] >= 26:
+        result = min(result, press)
+        continue
     # Guessed that by the time we have 4 valves open, the best
     # arrangment is the optimal configuration.
     # Saves a lot of time as we can skip many configurations.
     if len(state) > 4:
-        mn = 26 + minute if is_elep else minute
+        mn = me[0] + elep[0]
         if press > best.get((mn, frozenset(state)), 0):
             continue
         best[(mn, frozenset(state))] = press
-    if dist > 0:
-        heappush(
-            q, (press, toadd, minute + 1, curr, copy.copy(state), dist - 1, is_elep)
-        )
-        continue
-    if dist == 0:
-        press = press - toadd
-        result = min(result, press)
-        toadd = 0
+    curr = elep if is_elep else me
     options = []
     for npos in CAN_OPEN:
         if npos in state:
             continue
-        dist = DISTS[(curr, npos)]
-        if dist >= 26 - minute:
+        dist = DISTS[(curr[1], npos)]
+        if dist >= 26 - curr[0]:
             continue
-        options.append((VALVES[npos][0] * (26 - minute - dist), dist, npos))
+        options.append((VALVES[npos][0] * (26 - curr[0] - dist), dist, npos))
     for score, dist, tgt in options:
         nstate = copy.copy(state)
-        nstate.append(tgt)
-        heappush(q, (press, score, minute + 1, tgt, nstate, dist, is_elep))
-    if not options and not is_elep:
-        # Switch to elephant: set location back to "AA" and time back to
-        # minute 1 and carry on.
+        nstate.add(tgt)
+        if is_elep:
+            heappush(q, (press - score, me, (curr[0] + dist + 1, tgt), nstate, False))
+        else:
+            heappush(q, (press - score, (curr[0] + dist + 1, tgt), elep, nstate, True))
+    if not options:
         nstate = copy.copy(state)
-        heappush(q, (press, 0, 1, "AA", nstate, 0, True))
+        if is_elep:
+            heappush(q, (press, me, (curr[0] + 19, elep[1]), nstate, False))
+        else:
+            heappush(q, (press, (curr[0] + 19, me[1]), elep, nstate, True))
+
 
 # Part 2 = 2111
 print(f"answer = {-result}")
