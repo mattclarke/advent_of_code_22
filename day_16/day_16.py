@@ -87,11 +87,12 @@ while q:
     if me[0] >= 26 and elep[0] >= 26:
         result = min(result, press)
         continue
-    # Guessed that by the time we have 4 valves open, the best
-    # arrangment is the optimal configuration.
+    # Assumed that after half the time has passed then if the current
+    # is worse than the best for the current minute then it cannot 
+    # beat the best overall score achieved.
     # Saves a lot of time as we can skip many configurations.
-    if len(state) > 4:
-        mn = me[0] + elep[0]
+    mn = me[0] + elep[0]
+    if mn > 13:
         if press > best.get((mn, frozenset(state)), 0):
             continue
         best[(mn, frozenset(state))] = press
