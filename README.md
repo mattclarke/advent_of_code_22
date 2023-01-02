@@ -106,6 +106,8 @@ Note: it doesn't work for the example because I can open all the valves before c
 
 - Interleaved the moves of me and the elephant, so now it works for the example too.
 
+- Neatest internet solution seems to be to use DP, and for part 2 split the 'available' valves in two (one for the elephant and one for me) and run the code for part 1 twice for all combinations to get the highest score.
+
 ## Day 17
 - Part 1: implement the "game" - took me a while to do this!
 - Part 2: target to big to simulate, but after the simulation settles down the height increase per shape repeats. The repetition allows the answer to be derived mathematically, see the code for details.
@@ -121,7 +123,7 @@ An alternative would have been to record the top ~30 rows after each rock and se
 - Part 2: adjusted to new rules. Takes ~15 minutes to complete. Will try to speed it up.
 
 Update:
-- replacing the "score" with `minutes` rather than `r_geo` brings the times down to ~175s and ~700s. Using `minutes` is almost the same as doing a DFS? 
+- Replacing the "score" with `minutes` rather than `r_geo` brings the times down to ~175s and ~700s. Using `minutes` is almost the same as doing a DFS? 
 - Using a regular deque instead of a heapq reduces the times down to ~52 seconds and ~270 seconds.
 - Using `appendleft` when building a geode robot reduces the times a little (~47s and ~230s). Internet tip!
 - Last minute will produce the same number of geodes as the previous minute, so can just add `r_geode` and exit (~35s and 130s). Internet tip!
@@ -130,6 +132,11 @@ Update:
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
 - Part 2: the stepsize is huge, but as the list is circular we can use the modulo to reduce it. Took a while for me to realise I needed to take the modulo of the number of nodes - 1 because we have detached the original node!
+
+Pro tip:
+- Use a deque as the linked list and `queue.append(queue.popleft())` to rotate the list.
+- Rotating the item we are interested in to the front makes the maths easier.
+- Note: it is slower than a real linked list but quicker to implement!
 
 ## Day 21
 - Part 1: implement the algorithm as described.
@@ -144,14 +151,14 @@ Update:
 - Part 2: same thing, but count the elves that don't move and when that number equals the total number of elves return the round number.
 
 Update:
-- refactored to reduce the duplication by using a defaultdict. Simplies part 2 too.
+- Refactored to reduce the duplication by using a defaultdict. Simplies part 2 too.
 
 ## Day 24
 - Part 1: implemented the algorithm using heapq. Despite some branch trimming it is slow (~8 minutes).
 - Part 2: basically runs the algorithm three times. Very slow at ~28 minutes!  
 
 Update:
-- remove unnecessary copying brings part 1 down to <3 minutes and part 2 down to <11 minutes.
+- Remove unnecessary copying brings part 1 down to <3 minutes and part 2 down to <11 minutes.
 
 ## Day 25
 - Part 1: converting numbers to and from a weird base 5. Took me a while to work out how to convert back to decimal.
