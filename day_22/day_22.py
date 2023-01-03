@@ -163,32 +163,32 @@ for h in range(height):
             FACES[face].append(row)
         face += 1
 
-print(faces)
-
+# Convert the mapping to a common  net, namely:
+#
 #  A
 # BCD
 #  E
 #  F
-
-# 1 is clockwise
+#
+# 1 = rotation clockwise
 
 MAP_STD = {
     # U, R, D, L
-    'a': [('f', 0), ('d', 1), ('c', 0), ('b', -1)],
-    'b': [('a', 1), ('c', 0), ('e', -1), ('f', 2)],
-    'c': [('a', 0), ('d', 0), ('e', 0), ('b', 0)],
-    'd': [('a', -1), ('f', 2), ('e', 1), ('c', 0)],
-    'e': [('c', 0), ('d', -1), ('f', 0), ('b', 1)],
-    'f': [('e', 0), ('d', 2), ('a', 0), ('b', 2)],
+    "a": [("f", 0), ("d", 1), ("c", 0), ("b", -1)],
+    "b": [("a", 1), ("c", 0), ("e", -1), ("f", 2)],
+    "c": [("a", 0), ("d", 0), ("e", 0), ("b", 0)],
+    "d": [("a", -1), ("f", 2), ("e", 1), ("c", 0)],
+    "e": [("c", 0), ("d", -1), ("f", 0), ("b", 1)],
+    "f": [("e", 0), ("d", 2), ("a", 0), ("b", 2)],
 }
 
 mapping = {}
-q = [('a', 0, 0)]
+q = [("a", 0, 0)]
 seen = {0}
 
 while q:
     s, f, r = q.pop(0)
-    mapping[s] = (f,r)
+    mapping[s] = (f, r)
     curr_face = faces[f]
     for dr, dc in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
         try:
@@ -202,112 +202,31 @@ while q:
             # Down
             foo = (2 + r) % 4
             ns, rot = MAP_STD[s][foo]
-            q.append((ns, idx, rot))
+            # TODO: this is a hack to make sure we don't do 3 rotations
+            # 3 rotations == -1 rotation
+            # not very robust - rotate through a list and use mod?
+            nr = r + rot
+            nr = -1 if nr == 3 else nr
+            q.append((ns, idx, nr))
         if (dr, dc) == (0, 1):
             # Right
             foo = (1 + r) % 4
             ns, rot = MAP_STD[s][foo]
-            q.append((ns, idx, rot))
+            nr = r + rot
+            nr = -1 if nr == 3 else nr
+            q.append((ns, idx, nr))
         if (dr, dc) == (0, -1):
             # Left
             foo = (3 + r) % 4
             ns, rot = MAP_STD[s][foo]
-            q.append((ns, idx, rot))
+            nr = r + rot
+            nr = -1 if nr == 3 else nr
+            q.append((ns, idx, nr))
 
 print(mapping)
 
-# TODO: above we have mapped the input to the standard net, now we need to do the necessary rotations, etc.
 
-RIGHT = 0
-DOWN = 1
-LEFT = 2
-UP = 3
-
-JOINS = {
-    # right, down, left, up
-    1: (
-        (6, lambda r, c: (size - r - 1, size - 1), LEFT),
-        (4, lambda r, c: (0, c), DOWN),
-        (3, lambda r, c: (0, r), DOWN),
-        (2, lambda r, c: (0, size - c - 1), DOWN),
-    ),
-    2: (
-        (3, lambda r, c: (r, 0), RIGHT),
-        (5, lambda r, c: (size - 1, size - c - 1), UP),
-        (6, lambda r, c: (size - 1, size - r - 1), UP),
-        (1, lambda r, c: (0, size - c - 1), DOWN),
-    ),
-    3: (
-        (4, lambda r, c: (r, 0), RIGHT),
-        (5, lambda r, c: (size - c - 1, 0), RIGHT),
-        (2, lambda r, c: (r, size - 1), LEFT),
-        (1, lambda r, c: (c, 0), RIGHT),
-    ),
-    4: (
-        (6, lambda r, c: (0, size - r - 1), DOWN),
-        (5, lambda r, c: (0, c), DOWN),
-        (3, lambda r, c: (r, size - 1), LEFT),
-        (1, lambda r, c: (size - 1, c), UP),
-    ),
-    5: (
-        (6, lambda r, c: (r, 0), RIGHT),
-        (2, lambda r, c: (size - 1, size - c - 1), UP),
-        (3, lambda r, c: (size - 1, size - r - 1), UP),
-        (4, lambda r, c: (size - 1, c), UP),
-    ),
-    6: (
-        (1, lambda r, c: (size - r - 1, size - 1), LEFT),
-        (2, lambda r, c: (size - c - 1, 0), RIGHT),
-        (5, lambda r, c: (r, size - 1), LEFT),
-        (4, lambda r, c: (size - c - 1, size - 1), LEFT),
-    ),
-}
-
-if FILE == "input.txt":
-    JOINS = {
-        # right, down, left, up
-        1: (
-            (2, lambda r, c: (r, 0), RIGHT),
-            (3, lambda r, c: (0, c), DOWN),
-            (4, lambda r, c: (size - r - 1, 0), RIGHT),
-            (6, lambda r, c: (c, 0), RIGHT),
-        ),
-        2: (
-            (5, lambda r, c: (size - r - 1, size - 1), LEFT),
-            (3, lambda r, c: (c, size - 1), LEFT),
-            (1, lambda r, c: (r, size - 1), LEFT),
-            (6, lambda r, c: (size - 1, c), UP),
-        ),
-        3: (
-            (2, lambda r, c: (size - 1, r), UP),
-            (5, lambda r, c: (0, c), DOWN),
-            (4, lambda r, c: (0, r), DOWN),
-            (1, lambda r, c: (size - 1, c), UP),
-        ),
-        4: (
-            (5, lambda r, c: (r, 0), RIGHT),
-            (6, lambda r, c: (0, c), DOWN),
-            (1, lambda r, c: (size - r - 1, 0), RIGHT),
-            (3, lambda r, c: (c, 0), RIGHT),
-        ),
-        5: (
-            (2, lambda r, c: (size - r - 1, size - 1), LEFT),
-            (6, lambda r, c: (c, size - 1), LEFT),
-            (4, lambda r, c: (r, size - 1), LEFT),
-            (3, lambda r, c: (size - 1, c), UP),
-        ),
-        6: (
-            (5, lambda r, c: (size - 1, r), UP),
-            (2, lambda r, c: (0, c), DOWN),
-            (1, lambda r, c: (0, r), DOWN),
-            (4, lambda r, c: (size - 1, c), UP),
-        ),
-    }
-
-
-def print_face(nface, pos):
-    face = FACES[nface]
-    print("face", nface)
+def print_face(face, pos):
     for r, row in enumerate(face):
         tmp = []
         for c, ch in enumerate(row):
@@ -319,84 +238,165 @@ def print_face(nface, pos):
     print()
 
 
-puzzle = copy.copy(PUZZLE)
-heading = 0
-curr_face = 1
-pos = (0, 0)
+def rotate_face(face, num_rots):
+    if num_rots == 0:
+        return copy.deepcopy(face)
+    elif num_rots == 1:
+        nface = []
+        for i in range(len(face[0])):
+            row = []
+            for j in range(len(face) - 1, -1, -1):
+                row.append(face[j][i])
+            nface.append(row)
+    elif num_rots == -1:
+        nface = []
+        for i in range(len(face[0]) - 1, -1, -1):
+            row = []
+            for j in range(len(face)):
+                row.append(face[j][i])
+            nface.append(row)
+    elif abs(num_rots) == 2:
+        nface = []
+        for r in face:
+            row = list(reversed(r))
+            nface.insert(0, row)
 
-#print_face(curr_face, pos)
+    return nface
+
+
+NET = {}
+
+for name, (face, rot) in mapping.items():
+    NET[name] = rotate_face(FACES[face + 1], rot)
+
+UP = 0
+RIGHT = 1
+DOWN = 2
+LEFT = 3
+
+
+JOINS = {
+    # up, right, down, left
+    "a": (
+        ("f", lambda r, c: (size - 1, c), UP),
+        ("d", lambda r, c: (0, size - r - 1), DOWN),
+        ("c", lambda r, c: (0, c), DOWN),
+        ("b", lambda r, c: (0, r), DOWN),
+    ),
+    "b": (
+        ("a", lambda r, c: (c, 0), RIGHT),
+        ("c", lambda r, c: (r, 0), RIGHT),
+        ("e", lambda r, c: (size - c - 1, 0), RIGHT),
+        ("f", lambda r, c: (size - r - 1, 0), RIGHT),
+    ),
+    "c": (
+        ("a", lambda r, c: (size - 1, c), UP),
+        ("d", lambda r, c: (r, 0), RIGHT),
+        ("e", lambda r, c: (0, c), DOWN),
+        ("b", lambda r, c: (r, size - 1), LEFT),
+    ),
+    "d": (
+        ("a", lambda r, c: (size - c - 1, size - 1), LEFT),
+        ("f", lambda r, c: (size - r - 1, size - 1), LEFT),
+        ("e", lambda r, c: (c, size - 1), LEFT),
+        ("c", lambda r, c: (r, size - 1), LEFT),
+    ),
+    "e": (
+        ("c", lambda r, c: (size - 1, c), UP),
+        ("d", lambda r, c: (size - 1, r), UP),
+        ("f", lambda r, c: (0, c), DOWN),
+        ("b", lambda r, c: (size - 1, size - r - 1), UP),
+    ),
+    "f": (
+        ("e", lambda r, c: (size - 1, c), UP),
+        ("d", lambda r, c: (size - r - 1, size - 1), LEFT),
+        ("a", lambda r, c: (0, c), DOWN),
+        ("b", lambda r, c: (size - r - 1, 0), RIGHT),
+    ),
+}
+
+puzzle = copy.copy(PUZZLE)
+heading = RIGHT
+curr_face = "a"
+pos = (0, 0)
 
 while puzzle:
     dist = puzzle.pop(0)
     rot = puzzle.pop(0) if puzzle else ""
     for _ in range(dist):
-        if heading == RIGHT:
-            npos = (pos[0], pos[1] + 1)
-            try:
-                if FACES[curr_face][npos[0]][npos[1]] == "#":
+        if heading == UP:
+            npos = (pos[0] - 1, pos[1])
+            if npos[0] >= 0:
+                if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            except:
-                pass
-            if npos[1] >= size:
+            else:
+                # Change face
                 f, conv, nd = JOINS[curr_face][0]
                 npos = conv(*pos)
-                if FACES[f][npos[0]][npos[1]] == "#":
+                if NET[f][npos[0]][npos[1]] == "#":
+                    break
+                curr_face = f
+                heading = nd
+        elif heading == RIGHT:
+            npos = (pos[0], pos[1] + 1)
+            if npos[1] < size:
+                if NET[curr_face][npos[0]][npos[1]] == "#":
+                    break
+            else:
+                # Change face
+                f, conv, nd = JOINS[curr_face][1]
+                npos = conv(*pos)
+                if NET[f][npos[0]][npos[1]] == "#":
                     break
                 curr_face = f
                 heading = nd
         elif heading == DOWN:
             npos = (pos[0] + 1, pos[1])
-            try:
-                if FACES[curr_face][npos[0]][npos[1]] == "#":
+            if npos[0] < size:
+                if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            except:
-                pass
-            if npos[0] >= size:
-                f, conv, nd = JOINS[curr_face][1]
+            else:
+                # Change face
+                f, conv, nd = JOINS[curr_face][2]
                 npos = conv(*pos)
-                if FACES[f][npos[0]][npos[1]] == "#":
+                if NET[f][npos[0]][npos[1]] == "#":
                     break
                 curr_face = f
                 heading = nd
         elif heading == LEFT:
             npos = (pos[0], pos[1] - 1)
-            try:
-                if FACES[curr_face][npos[0]][npos[1]] == "#":
+            if npos[1] >= 0:
+                if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            except:
-                pass
-            if npos[1] < 0:
-                f, conv, nd = JOINS[curr_face][2]
-                npos = conv(*pos)
-                if FACES[f][npos[0]][npos[1]] == "#":
-                    break
-                curr_face = f
-                heading = nd
-        elif heading == UP:
-            npos = (pos[0] - 1, pos[1])
-            try:
-                if FACES[curr_face][npos[0]][npos[1]] == "#":
-                    break
-            except:
-                pass
-            if npos[0] < 0:
+            else:
+                # Change face
                 f, conv, nd = JOINS[curr_face][3]
                 npos = conv(*pos)
-                if FACES[f][npos[0]][npos[1]] == "#":
+                if NET[f][npos[0]][npos[1]] == "#":
                     break
                 curr_face = f
                 heading = nd
         pos = npos
-        #print_face(curr_face, pos)
     if rot == "R":
         heading = (heading + 1) % 4
     elif rot == "L":
         heading = (heading - 1) % 4
 
+# Convert back to "real" space
+curr_face, rotate = mapping[curr_face]
+curr_face += 1  # because faces start from 1 (for now)
+
+if rotate == 2:
+    pos = (size - pos[0], size - pos[1])
+elif rotate == 1:
+    pass
+elif rotate == -1:
+    pass
+
 result = (
     1000 * (FACE_COORDS[curr_face][0] + pos[0] + 1)
     + 4 * (FACE_COORDS[curr_face][1] + pos[1] + 1)
-    + heading
+    + [3, 0, 1, 2][heading]
 )
 
 # Part 2 = 53324
