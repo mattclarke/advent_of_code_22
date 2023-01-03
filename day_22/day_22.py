@@ -148,11 +148,13 @@ size, width, height = (
     (len(GRID) // 4, 3, 4) if len(GRID) > len(GRID[0]) else (len(GRID[0]) // 4, 4, 3)
 )
 
+faces = []
 face = 1
 for h in range(height):
     for w in range(width):
         if GRID[size * h][size * w] == " ":
             continue
+        faces.append((h, w))
         FACE_COORDS[face] = (size * h, size * w)
         for r in range(size * h, size * h + size):
             row = []
@@ -160,6 +162,61 @@ for h in range(height):
                 row.append(GRID[r][c])
             FACES[face].append(row)
         face += 1
+
+print(faces)
+
+#  A
+# BCD
+#  E
+#  F
+
+# 1 is clockwise
+
+MAP_STD = {
+    # U, R, D, L
+    'a': [('f', 0), ('d', 1), ('c', 0), ('b', -1)],
+    'b': [('a', 1), ('c', 0), ('e', -1), ('f', 2)],
+    'c': [('a', 0), ('d', 0), ('e', 0), ('b', 0)],
+    'd': [('a', -1), ('f', 2), ('e', 1), ('c', 0)],
+    'e': [('c', 0), ('d', -1), ('f', 0), ('b', 1)],
+    'f': [('e', 0), ('d', 2), ('a', 0), ('b', 2)],
+}
+
+mapping = {}
+q = [('a', 0, 0)]
+seen = {0}
+
+while q:
+    s, f, r = q.pop(0)
+    mapping[s] = (f,r)
+    curr_face = faces[f]
+    for dr, dc in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
+        try:
+            idx = faces.index((curr_face[0] + dr, curr_face[1] + dc))
+        except ValueError:
+            continue
+        if idx in seen:
+            continue
+        seen.add(idx)
+        if (dr, dc) == (1, 0):
+            # Down
+            foo = (2 + r) % 4
+            ns, rot = MAP_STD[s][foo]
+            q.append((ns, idx, rot))
+        if (dr, dc) == (0, 1):
+            # Right
+            foo = (1 + r) % 4
+            ns, rot = MAP_STD[s][foo]
+            q.append((ns, idx, rot))
+        if (dr, dc) == (0, -1):
+            # Left
+            foo = (3 + r) % 4
+            ns, rot = MAP_STD[s][foo]
+            q.append((ns, idx, rot))
+
+print(mapping)
+
+# TODO: above we have mapped the input to the standard net, now we need to do the necessary rotations, etc.
 
 RIGHT = 0
 DOWN = 1
