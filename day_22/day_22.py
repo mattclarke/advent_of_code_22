@@ -141,6 +141,11 @@ result = 1000 * (pos[0] + 1) + 4 * (pos[1] + 1) + heading
 # Part 1 = 109094
 print(f"answer = {result}")
 
+UP = 0
+RIGHT = 1
+DOWN = 2
+LEFT = 3
+
 FACES = {0: [], 1: [], 2: [], 3: [], 4: [], 5: []}
 FACE_COORDS = {}
 
@@ -163,7 +168,7 @@ for h in range(height):
             FACES[face].append(row)
         face += 1
 
-# Convert the mapping to a common  net, namely:
+# Convert the mapping to a common net, namely:
 #
 #  A
 # BCD
@@ -171,9 +176,10 @@ for h in range(height):
 #  F
 #
 # 1 = rotation clockwise
+# -1 = rotation anti-clockwise
 
-MAP_STD = {
-    # U, R, D, L
+STD_NET = {
+    # up, right, down, left
     "a": [("f", 0), ("d", 1), ("c", 0), ("b", -1)],
     "b": [("a", 1), ("c", 0), ("e", -1), ("f", 2)],
     "c": [("a", 0), ("d", 0), ("e", 0), ("b", 0)],
@@ -182,48 +188,38 @@ MAP_STD = {
     "f": [("e", 0), ("d", 2), ("a", 0), ("b", 2)],
 }
 
+
+def move_face(face, heading, curr_rot):
+    new_heading = (heading + curr_rot) % 4
+    new_face, rot = STD_NET[face][new_heading]
+    # add the rotation and normalise, e.g.
+    # a rotation of 3 is equivalent to -1.
+    # a rotation of -2 is equivalent to 2.
+    new_rot = [0, 1, 2, -1][(curr_rot + rot) % 4]
+    return new_face, new_rot
+
+
+directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
 mapping = {}
 q = [("a", 0, 0)]
 seen = {0}
 
 while q:
-    s, f, r = q.pop(0)
-    mapping[s] = (f, r)
-    curr_face = faces[f]
-    for dr, dc in [(-1, 0), (0, 1), (1, 0), (0, -1)]:
+    # face_name is one of 'a', 'b', etc.
+    # face_number refers back to faces in order based on the puzzle data
+    face_name, face_number, rot = q.pop(0)
+    mapping[face_name] = (face_number, rot)
+    r, c = faces[face_number]
+    for heading, (dr, dc) in enumerate(directions):
         try:
-            idx = faces.index((curr_face[0] + dr, curr_face[1] + dc))
+            idx = faces.index((r + dr, c + dc))
         except ValueError:
             continue
         if idx in seen:
             continue
         seen.add(idx)
-        if (dr, dc) == (1, 0):
-            # Down
-            foo = (2 + r) % 4
-            ns, rot = MAP_STD[s][foo]
-            # TODO: this is a hack to make sure we don't do 3 rotations
-            # 3 rotations == -1 rotation
-            # not very robust - rotate through a list and use mod?
-            nr = r + rot
-            nr = -1 if nr == 3 else nr
-            q.append((ns, idx, nr))
-        if (dr, dc) == (0, 1):
-            # Right
-            foo = (1 + r) % 4
-            ns, rot = MAP_STD[s][foo]
-            nr = r + rot
-            nr = -1 if nr == 3 else nr
-            q.append((ns, idx, nr))
-        if (dr, dc) == (0, -1):
-            # Left
-            foo = (3 + r) % 4
-            ns, rot = MAP_STD[s][foo]
-            nr = r + rot
-            nr = -1 if nr == 3 else nr
-            q.append((ns, idx, nr))
-
-print(mapping)
+        new_face, new_rot = move_face(face_name, heading, rot)
+        q.append((new_face, idx, new_rot))
 
 
 def print_face(face, pos):
@@ -269,11 +265,6 @@ NET = {}
 for name, (face, rot) in mapping.items():
     NET[name] = rotate_face(FACES[face], rot)
 
-UP = 0
-RIGHT = 1
-DOWN = 2
-LEFT = 3
-
 
 JOINS = {
     # up, right, down, left
@@ -315,6 +306,7 @@ JOINS = {
     ),
 }
 
+
 puzzle = copy.copy(PUZZLE)
 heading = RIGHT
 curr_face = "a"
@@ -324,58 +316,39 @@ while puzzle:
     dist = puzzle.pop(0)
     rot = puzzle.pop(0) if puzzle else ""
     for _ in range(dist):
+        dr, dc = directions[heading]
+        npos = (pos[0] + dr, pos[1] + dc)
         if heading == UP:
-            npos = (pos[0] - 1, pos[1])
             if npos[0] >= 0:
                 if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            else:
-                # Change face
-                f, conv, nd = JOINS[curr_face][0]
-                npos = conv(*pos)
-                if NET[f][npos[0]][npos[1]] == "#":
-                    break
-                curr_face = f
-                heading = nd
+                pos = npos
+                continue
         elif heading == RIGHT:
-            npos = (pos[0], pos[1] + 1)
             if npos[1] < size:
                 if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            else:
-                # Change face
-                f, conv, nd = JOINS[curr_face][1]
-                npos = conv(*pos)
-                if NET[f][npos[0]][npos[1]] == "#":
-                    break
-                curr_face = f
-                heading = nd
+                pos = npos
+                continue
         elif heading == DOWN:
-            npos = (pos[0] + 1, pos[1])
             if npos[0] < size:
                 if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            else:
-                # Change face
-                f, conv, nd = JOINS[curr_face][2]
-                npos = conv(*pos)
-                if NET[f][npos[0]][npos[1]] == "#":
-                    break
-                curr_face = f
-                heading = nd
+                pos = npos
+                continue
         elif heading == LEFT:
-            npos = (pos[0], pos[1] - 1)
             if npos[1] >= 0:
                 if NET[curr_face][npos[0]][npos[1]] == "#":
                     break
-            else:
-                # Change face
-                f, conv, nd = JOINS[curr_face][3]
-                npos = conv(*pos)
-                if NET[f][npos[0]][npos[1]] == "#":
-                    break
-                curr_face = f
-                heading = nd
+                pos = npos
+                continue
+        # Change face
+        f, conv, nd = JOINS[curr_face][heading]
+        npos = conv(*pos)
+        if NET[f][npos[0]][npos[1]] == "#":
+            break
+        curr_face = f
+        heading = nd
         pos = npos
     if rot == "R":
         heading = (heading + 1) % 4
@@ -388,9 +361,9 @@ curr_face, rotate = mapping[curr_face]
 if rotate == 2:
     pos = (size - pos[0], size - pos[1])
 elif rotate == 1:
-    pass
+    pos = (pos[1], size - pos[0])
 elif rotate == -1:
-    pass
+    pos = (size - pos[1], pos[0])
 
 result = (
     1000 * (FACE_COORDS[curr_face][0] + pos[0] + 1)
