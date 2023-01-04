@@ -141,7 +141,7 @@ result = 1000 * (pos[0] + 1) + 4 * (pos[1] + 1) + heading
 # Part 1 = 109094
 print(f"answer = {result}")
 
-FACES = {1: [], 2: [], 3: [], 4: [], 5: [], 6: []}
+FACES = {0: [], 1: [], 2: [], 3: [], 4: [], 5: []}
 FACE_COORDS = {}
 
 size, width, height = (
@@ -149,7 +149,7 @@ size, width, height = (
 )
 
 faces = []
-face = 1
+face = 0
 for h in range(height):
     for w in range(width):
         if GRID[size * h][size * w] == " ":
@@ -267,7 +267,7 @@ def rotate_face(face, num_rots):
 NET = {}
 
 for name, (face, rot) in mapping.items():
-    NET[name] = rotate_face(FACES[face + 1], rot)
+    NET[name] = rotate_face(FACES[face], rot)
 
 UP = 0
 RIGHT = 1
@@ -384,7 +384,6 @@ while puzzle:
 
 # Convert back to "real" space
 curr_face, rotate = mapping[curr_face]
-curr_face += 1  # because faces start from 1 (for now)
 
 if rotate == 2:
     pos = (size - pos[0], size - pos[1])
