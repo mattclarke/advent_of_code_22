@@ -103,31 +103,28 @@ def calc_manhatten(pos, tgt):
         return pos[0] - tgt[0] + pos[1] - tgt[1]
 
 
-def solve(start, end, wind_idx):
+def solve(start, end, minute):
     result = 100000000000000000
-    result_wind = None
-    q = [((calc_manhatten(start, end), 0), 0, start, wind_idx)]
+    q = [((calc_manhatten(start, end), minute), minute, start)]
     SEEN = set()
     while q:
-        score, minute, pos, wind_idx = heappop(q)
+        score, minute, pos = heappop(q)
         md = calc_manhatten(pos, end)
         if md == 1:
             # Once we are within one can go straight to the exit.
             if minute + 1 < result:
                 if minute + 1 < result:
                     result = minute + 1
-                    result_wind = (wind_idx + 1) % len(WIND_CACHE)
             continue
         if minute >= result:
             continue
         if minute + md >= result:
             continue
-        if (pos, wind_idx) in SEEN:
+        if (pos, minute) in SEEN:
             continue
-        SEEN.add((pos, wind_idx))
+        SEEN.add((pos, minute))
 
-        new_idx = (wind_idx + 1) % len(WIND_CACHE)
-        wind_squares = WIND_CACHE[new_idx]
+        wind_squares = WIND_CACHE[(minute + 1) % len(WIND_CACHE)]
         for dr, dc in D:
             npos = (pos[0] + dr, pos[1] + dc)
             if npos[0] < 0 or npos[0] > len(GRID) - 1:
@@ -137,24 +134,22 @@ def solve(start, end, wind_idx):
             elif GRID[npos[0]][npos[1]] == ".":
                 if minute + 1 >= result:
                     continue
-                heappush(
-                    q, ((calc_manhatten(npos, end), -minute), minute + 1, npos, new_idx)
-                )
+                heappush(q, ((calc_manhatten(npos, end), -minute), minute + 1, npos))
         # wait
         if pos in wind_squares:
             # cannot stay put
             continue
-        heappush(q, ((calc_manhatten(pos, end), -minute), minute + 1, pos, new_idx))
-    return result, result_wind
+        heappush(q, ((calc_manhatten(pos, end), -minute), minute + 1, pos))
+    return result
 
 
-one_way, wind_idx = solve(START, END, 0)
+minute = solve(START, END, 0)
 
 # Part 1 = 242
-print(f"answer = {one_way}")
+print(f"answer = {minute}")
 
-back_to_start, wind_idx = solve(END, START, wind_idx)
-and_to_end, _ = solve(START, END, wind_idx)
+minute = solve(END, START, minute)
+minute = solve(START, END, minute)
 
 # Part 2 = 720
-print(f"answer = {one_way + back_to_start + and_to_end}")
+print(f"answer = {minute}")
