@@ -164,6 +164,7 @@ Update:
 - Remove unnecessary copying brings part 1 down to <3 minutes and part 2 down to <11 minutes.
 - STUPID! Nothing wrong with my solution concept but continually creating frozenset is incredibly slow. Removing that from what goes into SEEN (as it turns out not to be required!) brings it down to ~30s!
 - Creating the wind cache beforehand and indexing it by the minute modulo the cache length brings it down to ~3 seconds (because it removes the excessive tuple creation I was using when creating the cache). Internet tip!
+- heapq is unnecessary, using a standard deque-based BFS is actually faster at ~1 second.
 
 ## Day 25
 - Part 1: converting numbers to and from a weird base 5. Took me a while to work out how to convert back to decimal.

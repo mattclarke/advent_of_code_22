@@ -96,29 +96,16 @@ while True:
 D = [(1, 0), (0, -1), (0, 1), (-1, 0)]
 
 
-def calc_manhatten(pos, tgt):
-    if tgt == END:
-        return tgt[0] - pos[0] + tgt[1] - pos[1]
-    else:
-        return pos[0] - tgt[0] + pos[1] - tgt[1]
-
-
 def solve(start, end, minute):
     result = 100000000000000000
-    q = [((calc_manhatten(start, end), minute), minute, start)]
+    q = deque([(minute, start)])
     SEEN = set()
     while q:
-        score, minute, pos = heappop(q)
-        md = calc_manhatten(pos, end)
-        if md == 1:
-            # Once we are within one can go straight to the exit.
-            if minute + 1 < result:
-                if minute + 1 < result:
-                    result = minute + 1
+        minute, pos = q.popleft()
+        if pos == end:
+            result = min(result, minute)
             continue
         if minute >= result:
-            continue
-        if minute + md >= result:
             continue
         if (pos, minute) in SEEN:
             continue
@@ -134,12 +121,12 @@ def solve(start, end, minute):
             elif GRID[npos[0]][npos[1]] == ".":
                 if minute + 1 >= result:
                     continue
-                heappush(q, ((calc_manhatten(npos, end), -minute), minute + 1, npos))
+                q.append((minute + 1, npos))
         # wait
         if pos in wind_squares:
             # cannot stay put
             continue
-        heappush(q, ((calc_manhatten(pos, end), -minute), minute + 1, pos))
+        q.append((minute + 1, pos))
     return result
 
 
