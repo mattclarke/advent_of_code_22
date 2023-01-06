@@ -51,17 +51,23 @@ def show(grid, winds, pos):
     print()
 
 
-# show(GRID, WINDS, START)
+# Prebuild the wind cache
 winds = WINDS
 WIND_CACHE = {}
+WIND_SEEN = set()
+t = 0
 
-
-def update_winds(winds):
-    cached = WIND_CACHE.get(tuple(winds))
-    if cached:
-        return cached
-    nwinds = []
+while True:
+    if t == 0:
+        squares = set()
+        for r, c, d in winds:
+            if d in {">", "<", "v", "^"}:
+                squares.add((r, c))
+        WIND_CACHE[t] = squares
+        WIND_SEEN.add(frozenset(squares))
+    t += 1
     squares = set()
+    nwinds = []
     for i, (r, c, d) in enumerate(winds):
         if d == ">":
             c += 1
@@ -81,9 +87,10 @@ def update_winds(winds):
                 r = 1
         nwinds.append((r, c, d))
         squares.add((r, c))
-    nwinds = tuple(nwinds)
-    WIND_CACHE[tuple(winds)] = (nwinds, squares)
-    return nwinds, squares
+    winds = nwinds
+    if squares in WIND_SEEN:
+        break
+    WIND_CACHE[t] = squares
 
 
 D = [(1, 0), (0, -1), (0, 1), (-1, 0)]
@@ -96,29 +103,31 @@ def calc_manhatten(pos, tgt):
         return pos[0] - tgt[0] + pos[1] - tgt[1]
 
 
-def solve(start, end, winds):
+def solve(start, end, wind_idx):
     result = 100000000000000000
-    result_wind = []
-    q = [((calc_manhatten(start, end), 0), 0, start, winds)]
+    result_wind = None
+    q = [((calc_manhatten(start, end), 0), 0, start, wind_idx)]
     SEEN = set()
     while q:
-        score, minute, pos, winds = heappop(q)
+        score, minute, pos, wind_idx = heappop(q)
         md = calc_manhatten(pos, end)
         if md == 1:
             # Once we are within one can go straight to the exit.
             if minute + 1 < result:
-                result = min(result, minute + 1)
-                result_wind, _ = update_winds(winds)
-                print(result, len(q))
+                if minute + 1 < result:
+                    result = minute + 1
+                    result_wind = (wind_idx + 1) % len(WIND_CACHE)
             continue
         if minute >= result:
             continue
-        if minute + md  >= result:
+        if minute + md >= result:
             continue
-        if (minute, pos, frozenset(winds)) in SEEN:
+        if (pos, wind_idx) in SEEN:
             continue
-        SEEN.add((minute, pos, frozenset(winds)))
-        winds, wind_squares = update_winds(winds)
+        SEEN.add((pos, wind_idx))
+
+        new_idx = (wind_idx + 1) % len(WIND_CACHE)
+        wind_squares = WIND_CACHE[new_idx]
         for dr, dc in D:
             npos = (pos[0] + dr, pos[1] + dc)
             if npos[0] < 0 or npos[0] > len(GRID) - 1:
@@ -129,23 +138,23 @@ def solve(start, end, winds):
                 if minute + 1 >= result:
                     continue
                 heappush(
-                    q, ((calc_manhatten(npos, end), -minute), minute + 1, npos, winds)
+                    q, ((calc_manhatten(npos, end), -minute), minute + 1, npos, new_idx)
                 )
         # wait
         if pos in wind_squares:
             # cannot stay put
             continue
-        heappush(q, ((calc_manhatten(pos, end), -minute), minute + 1, pos, winds))
+        heappush(q, ((calc_manhatten(pos, end), -minute), minute + 1, pos, new_idx))
     return result, result_wind
 
 
-one_way, winds = solve(START, END, winds)
+one_way, wind_idx = solve(START, END, 0)
 
 # Part 1 = 242
 print(f"answer = {one_way}")
 
-back_to_start, winds = solve(END, START, winds)
-and_to_end, winds = solve(START, END, winds)
+back_to_start, wind_idx = solve(END, START, wind_idx)
+and_to_end, _ = solve(START, END, wind_idx)
 
 # Part 2 = 720
 print(f"answer = {one_way + back_to_start + and_to_end}")

@@ -162,6 +162,7 @@ Update:
 
 Update:
 - Remove unnecessary copying brings part 1 down to <3 minutes and part 2 down to <11 minutes.
+- STUPID! Nothing wrong with my solution except continually creating frozenset is incredibly slow. Remove that by creating the wind cache before hand and now it takes ~3 seconds!
 
 ## Day 25
 - Part 1: converting numbers to and from a weird base 5. Took me a while to work out how to convert back to decimal.
