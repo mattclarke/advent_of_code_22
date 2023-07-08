@@ -1042,4 +1042,3 @@ dir mmhtpz
 $ cd mmhtpz
 $ ls
 25218 dtdt
-
