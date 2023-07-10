@@ -23,19 +23,18 @@ defmodule Foo do
 
   defp move_head(direction, steps, [head | tail], visited) do
     new_head = step_head(head, direction)
-    new_tail = update_followers([new_head | tail])
-    knots = [new_head | new_tail]
+    knots = update_rope([new_head | tail])
     visited = MapSet.put(visited, List.last(knots))
     move_head(direction, steps - 1, knots, visited)
   end
 
-  defp update_followers([first, second | tail]) do
+  defp update_rope([first, second | tail]) do
     second = step_tail(first, second)
-    [second | update_followers([second | tail])]
+    [first | update_rope([second | tail])]
   end
 
-  defp update_followers([_ | _]) do
-    []
+  defp update_rope([first | _]) do
+    [first]
   end
 
   defp step_head(head_pos, direction) do
