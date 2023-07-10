@@ -17,13 +17,17 @@ defmodule Foo do
     do_instruction(input_data, knots, MapSet.new())
   end
 
+  defp do_instruction([], _, visited) do
+    visited
+  end
+
   defp do_instruction([{direction, steps} | tail], knots, visited) do
     {new_knots, new_visited} = move_head(direction, steps, knots, visited)
     do_instruction(tail, new_knots, new_visited)
   end
 
-  defp do_instruction([], _, visited) do
-    visited
+  defp move_head(_, 0, knots, visited) do
+    {knots, visited}
   end
 
   defp move_head(direction, steps, [head | tail], visited) do
@@ -31,26 +35,17 @@ defmodule Foo do
     new_tail = update_followers([new_head | tail])
     knots = [new_head | new_tail]
     visited = MapSet.put(visited, List.last(knots))
-    if steps == 1 do
-      {knots, visited}
-    else
-      move_head(direction, steps - 1, knots, visited)
-    end
+    move_head(direction, steps - 1, knots, visited)
   end
 
-  defp update_followers([first | tail]) do
-    if length(tail) > 0 do
-      [second | tail] = tail
-      second = step_tail(first, second)
-      result = update_followers([second | tail])
-      [second | result]
-    else
-      []
-    end
-  end
-
-  defp update_followers([]) do
+  defp update_followers([_ | _]) do
     []
+  end
+
+  defp update_followers([first, second | tail]) do
+    second = step_tail(first, second)
+    result = update_followers([second | tail])
+    [second | result]
   end
 
   defp step_head(head_pos, direction) do
