@@ -14,16 +14,7 @@ defmodule Foo do
       1..rope_length
       |> Enum.reduce([], fn _, acc -> [{0, 0} | acc] end)
 
-    do_instruction(input_data, knots, MapSet.new())
-  end
-
-  defp do_instruction([], _, visited) do
-    visited
-  end
-
-  defp do_instruction([{direction, steps} | tail], knots, visited) do
-    {new_knots, new_visited} = move_head(direction, steps, knots, visited)
-    do_instruction(tail, new_knots, new_visited)
+    Enum.reduce(input_data, {knots, MapSet.new()}, fn {d, s}, {k, v} -> move_head(d, s, k, v) end)
   end
 
   defp move_head(_, 0, knots, visited) do
@@ -38,14 +29,13 @@ defmodule Foo do
     move_head(direction, steps - 1, knots, visited)
   end
 
-  defp update_followers([_ | _]) do
-    []
-  end
-
   defp update_followers([first, second | tail]) do
     second = step_tail(first, second)
-    result = update_followers([second | tail])
-    [second | result]
+    [second | update_followers([second | tail])]
+  end
+
+  defp update_followers([_ | _]) do
+    []
   end
 
   defp step_head(head_pos, direction) do
@@ -75,8 +65,8 @@ defmodule Foo do
   end
 end
 
-result = Foo.solve(input_data, 2)
+{_, result} = Foo.solve(input_data, 2)
 IO.puts("Answer to part 1 = #{MapSet.size(result)}")
 
-result = Foo.solve(input_data, 10)
+{_, result} = Foo.solve(input_data, 10)
 IO.puts("Answer to part 2 = #{MapSet.size(result)}")
