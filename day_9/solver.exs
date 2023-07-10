@@ -9,15 +9,9 @@ input_data =
   |> Enum.to_list()
 
 defmodule Foo do
-  def solve1(input_data) do
-    knots = [{0, 0}, {0, 0}]
-
-    do_instruction(input_data, knots, MapSet.new())
-  end
-
-  def solve2(input_data) do
+  def solve(input_data, rope_length) do
     knots =
-      1..10
+      1..rope_length
       |> Enum.reduce([], fn _, acc -> [{0, 0} | acc] end)
 
     do_instruction(input_data, knots, MapSet.new())
@@ -86,8 +80,8 @@ defmodule Foo do
   end
 end
 
-result = Foo.solve1(input_data)
+result = Foo.solve(input_data, 2)
 IO.puts("Answer to part 1 = #{MapSet.size(result)}")
 
-result = Foo.solve2(input_data)
+result = Foo.solve(input_data, 10)
 IO.puts("Answer to part 2 = #{MapSet.size(result)}")
