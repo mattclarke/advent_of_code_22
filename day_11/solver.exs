@@ -1,12 +1,12 @@
 monkeys = %{
-  0 => [64],
-  1 => [60, 84, 84, 65],
-  2 => [52, 67, 74, 88, 51, 61],
-  3 => [67, 72],
-  4 => [80, 79, 58, 77, 68, 74, 98, 64],
-  5 => [62, 53, 61, 89, 86],
-  6 => [86, 89, 82],
-  7 => [92, 81, 70, 96, 69, 84, 83],
+  0 => {[64], 0},
+  1 => {[60, 84, 84, 65], 0},
+  2 => {[52, 67, 74, 88, 51, 61], 0},
+  3 => {[67, 72], 0},
+  4 => {[80, 79, 58, 77, 68, 74, 98, 64], 0},
+  5 => {[62, 53, 61, 89, 86], 0},
+  6 => {[86, 89, 82], 0},
+  7 => {[92, 81, 70, 96, 69, 84, 83], 0},
 }
 
 rules = %{
@@ -37,14 +37,15 @@ defmodule Foo do
   end
 
   defp inspect_items(monkeys, rules, current) do
-    items = Map.get(monkeys, current)
+    {items, inspections} = Map.get(monkeys, current)
     r = Map.get(rules, current)
     new_monkeys =
       Enum.reduce(items, monkeys, fn x, acc ->
         {dest, worry} = inspect_item(x, r)
-        %{acc | dest => Map.get(acc, dest) ++ [worry]}
+        {ditems, dinspections} = Map.get(acc, dest)
+        %{acc | dest => {ditems ++ [worry], dinspections}}
       end)
-    new_monkeys = %{new_monkeys | current => []}
+    new_monkeys = %{new_monkeys | current => {[], inspections + length(items)}}
     inspect_items(new_monkeys, rules, current + 1)
   end
 
@@ -57,10 +58,24 @@ defmodule Foo do
   end
 end
 
-IO.inspect(monkeys)
+result =
+  Foo.solve(monkeys, rules, 20)
+  |> Map.values()
+  |> Stream.map(fn {_, v} -> v end)
+  |> Enum.sort(:desc)
+  |> IO.inspect()
+  |> Enum.take(2)
+  |> Enum.reduce(1, fn x, acc -> x * acc end)
 
-result = Foo.solve(monkeys, rules, 20)
+IO.puts("Answer to part 1 = #{result}")
 
-IO.inspect(result)
+result =
+  Foo.solve(monkeys, rules, 10000)
+  |> Map.values()
+  |> Stream.map(fn {_, v} -> v end)
+  |> Enum.sort(:desc)
+  |> IO.inspect()
+  |> Enum.take(2)
+  |> Enum.reduce(1, fn x, acc -> x * acc end)
 
-# IO.puts("Answer to part 1 = #{total}")
+IO.puts("Answer to part 2 = #{result}")
