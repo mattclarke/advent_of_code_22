@@ -13,7 +13,6 @@ recipes =
       geode: {String.to_integer(elem(x, 27)), 0, String.to_integer(elem(x, 30))}
     }
   end)
-  |> IO.inspect()
 
 defmodule Foo do
   def solve(recipes, rounds) do
@@ -26,12 +25,13 @@ defmodule Foo do
     |> Enum.reverse()
   end
 
-  defp run_recipe(_, _, {_, _, _, geode}, 0, cache) do
-    {geode, cache}
+  defp run_recipe(_, {_, _, _, rgeode}, {_, _, _, geode}, 1, cache) do
+    {geode + rgeode, cache}
   end
 
   defp run_recipe(recipe, robots, materials, rounds, cache) do
     # IO.inspect({rounds, robots, materials})
+    materials = normalise_materials(materials, robots, recipe)
     cache_value = Map.get(cache, generate_cache_key(robots, materials, rounds))
     # Ugly if use 'when' in signiture?
     if cache_value == nil do
@@ -72,12 +72,46 @@ defmodule Foo do
       {r, cache} = run_recipe(recipe, robots, mine(robots, materials), rounds - 1, cache)
       result = max(result, r)
 
+      materials = normalise_materials(materials, robots, recipe)
       cache = Map.put(cache, generate_cache_key(robots, materials, rounds), result)
 
       {result, cache}
     else
       {cache_value, cache}
     end
+  end
+
+  defp normalise_materials(materials, robots, recipe) do
+    {max_ore, max_clay, max_obsidian} =
+      Enum.reduce(Map.values(recipe), {0, 0, 0}, fn {o, c, ob}, {mo, mc, mob} ->
+        {max(mo, o), max(mc, c), max(mob, ob)}
+      end)
+
+    {ore, clay, obsidian, geode} = materials
+    {rore, rclay, robsidian, _} = robots
+
+    ore =
+      if rore == max_ore and ore > max_ore do
+        max_ore
+      else
+        ore
+      end
+
+    clay =
+      if rclay == max_clay and clay > max_clay do
+        max_clay
+      else
+        clay
+      end
+
+    obsidian =
+      if robsidian == max_obsidian and obsidian > max_obsidian do
+        max_obsidian
+      else
+        obsidian
+      end
+
+    {ore, clay, obsidian, geode}
   end
 
   defp applesauce(type, robots, materials, recipe, rounds, cache) do
@@ -198,6 +232,4 @@ result =
     acc + v * i
   end)
 
-IO.inspect(result)
-
-# IO.puts("Answer to part 1 = #{result}")
+IO.puts("Answer to part 1 = #{result}")
