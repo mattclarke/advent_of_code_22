@@ -18,9 +18,11 @@ recipes =
 defmodule Foo do
   def solve(recipes, rounds) do
     robots = {1, 0, 0, 0}
+
     Enum.reduce(recipes, [], fn x, acc ->
       {result, _} = run_recipe(x, robots, {0, 0, 0, 0}, rounds, %{})
-      [result | acc] end)
+      [result | acc]
+    end)
     |> Enum.reverse()
   end
 
@@ -36,36 +38,36 @@ defmodule Foo do
       result = 0
 
       {result, cache} =
-      if can_build("geode", materials, recipe) do
-        {r, cache} = applesauce("geode", robots, materials, recipe, rounds, cache)
-        {max(result, r), cache}
-      else
-        {result, cache}
-      end
+        if can_build("geode", robots, materials, recipe) do
+          {r, cache} = applesauce("geode", robots, materials, recipe, rounds, cache)
+          {max(result, r), cache}
+        else
+          {result, cache}
+        end
 
       {result, cache} =
-      if can_build("obsidian", materials, recipe) do
-        {r, cache} = applesauce("obsidian", robots, materials, recipe, rounds, cache)
-        {max(result, r), cache}
-      else
-        {result, cache}
-      end
+        if can_build("obsidian", robots, materials, recipe) do
+          {r, cache} = applesauce("obsidian", robots, materials, recipe, rounds, cache)
+          {max(result, r), cache}
+        else
+          {result, cache}
+        end
 
       {result, cache} =
-      if can_build("clay", materials, recipe) do
-        {r, cache} = applesauce("clay", robots, materials, recipe, rounds, cache)
-        {max(result, r), cache}
-      else
-        {result, cache}
-      end
+        if can_build("clay", robots, materials, recipe) do
+          {r, cache} = applesauce("clay", robots, materials, recipe, rounds, cache)
+          {max(result, r), cache}
+        else
+          {result, cache}
+        end
 
       {result, cache} =
-      if can_build("ore", materials, recipe) do
-        {r, cache} = applesauce("ore", robots, materials, recipe, rounds, cache)
-        {max(result, r), cache}
-      else
-        {result, cache}
-      end
+        if can_build("ore", robots, materials, recipe) do
+          {r, cache} = applesauce("ore", robots, materials, recipe, rounds, cache)
+          {max(result, r), cache}
+        else
+          {result, cache}
+        end
 
       {r, cache} = run_recipe(recipe, robots, mine(robots, materials), rounds - 1, cache)
       result = max(result, r)
@@ -79,43 +81,64 @@ defmodule Foo do
   end
 
   defp applesauce(type, robots, materials, recipe, rounds, cache) do
-      materials = mine(robots, materials)
-      {robots, materials} = build(type, robots, materials, recipe)
-      run_recipe(recipe, robots, materials, rounds - 1, cache)
+    materials = mine(robots, materials)
+    {robots, materials} = build(type, robots, materials, recipe)
+    run_recipe(recipe, robots, materials, rounds - 1, cache)
   end
 
   defp generate_cache_key(robots, materials, rounds) do
     {robots, materials, rounds}
   end
 
-  defp can_build(type, materials, recipe) do
-    recipe =
+  defp can_build(type, robots, materials, recipe) do
+    {rore, rclay, robsidian, _} = robots
+
+    {recipe, below_limit} =
       case type do
         "ore" ->
-          recipe.ore
+          max_ore =
+            Enum.reduce(Map.values(recipe), 0, fn {o, _, _}, acc ->
+              max(acc, o)
+            end)
+
+          {recipe.ore, rore < max_ore}
 
         "clay" ->
-          recipe.clay
+          max_clay =
+            Enum.reduce(Map.values(recipe), 0, fn {_, o, _}, acc ->
+              max(acc, o)
+            end)
+
+          {recipe.clay, rclay < max_clay}
 
         "obsidian" ->
-          recipe.obsidian
+          max_obsidian =
+            Enum.reduce(Map.values(recipe), 0, fn {_, _, o}, acc ->
+              max(acc, o)
+            end)
+
+          {recipe.obsidian, robsidian < max_obsidian}
 
         "geode" ->
-          recipe.geode
+          {recipe.geode, true}
       end
 
-    Enum.zip(Tuple.to_list(materials), Tuple.to_list(recipe))
-    |> Enum.reduce(true, fn {m, r}, acc ->
-      if acc == false do
-        false
-      else
-        if m >= r do
-          true
-        else
+    if below_limit do
+      Enum.zip(Tuple.to_list(materials), Tuple.to_list(recipe))
+      |> Enum.reduce(true, fn {m, r}, acc ->
+        if acc == false do
           false
+        else
+          if m >= r do
+            true
+          else
+            false
+          end
         end
-      end
-    end)
+      end)
+    else
+      false
+    end
   end
 
   defp mine(robots, materials) do
@@ -170,11 +193,11 @@ end
 
 result =
   Foo.solve(recipes, 24)
-  |> IO.inspect()
   |> Enum.with_index(1)
   |> Enum.reduce(0, fn {v, i}, acc ->
     acc + v * i
   end)
+
 IO.inspect(result)
 
 # IO.puts("Answer to part 1 = #{result}")
