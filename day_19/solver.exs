@@ -260,3 +260,11 @@ result =
   end)
 
 IO.puts("Answer to part 1 = #{result}")
+
+result =
+  recipes
+  |> Enum.take(3)
+  |> Foo.solve(32)
+  |> Enum.product()
+
+IO.puts("Answer to part 2 = #{result}")
