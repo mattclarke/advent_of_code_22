@@ -29,18 +29,11 @@ defmodule Foo do
     {geode + rgeode, cache, max(max_geodes, geode + rgeode)}
   end
 
-  # defp run_recipe(
-  #        recipe,
-  #        robots,
-  #        materials,
-  #        rounds,
-  #        cache,
-  #        max_geodes,
-  #        can_build_ore,
-  #        can_build_clay,
-  #        can_build_obsidian
-  #      ) when Map.has_key?(cache, {robots, materials, rounds}) do
-  # end
+  # TODO: try storing the minute in the cache rather than the geodes and then abandon a branch if we
+  # hit it later than the cached version.
+  # TODO: create our own cache wrapper, so we can count the number of cache misses.
+  # TODO: continue tidying. Perhaps putting the robot and materials (cache and max_geodes) into the same dict?
+  # TODO: lots of duplication before applesauce
 
   defp run_recipe(
          recipe,

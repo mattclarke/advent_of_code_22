@@ -129,6 +129,18 @@ Update:
 - Last minute will produce the same number of geodes as the previous minute, so can just add `r_geode` and exit (~35s and 130s). Internet tip!
 - Throw away any materials we cannot spend in the remaining time. This reduces the number of different states, so we are more likely to hit the cache for major speed increases (~14s and ~40s!). Internet tip!
 
+Update July 2023:
+- watched this video https://youtu.be/5rb0vvJ7NCY before trying to implement this in Elixir
+- Initial working version with cache takes 993s (16.5 minutes) for part 1.
+- Only building the maximum required number of robots (e.g. if the most ore required for a build is 4 then we only need 4 ore robots) brings it down to 99s.
+- Skip the final round as it will produce the same number of geodes as the previous round = 46s.
+- Throw away materials we don't need to reduce the number of cache states = 22s.
+- Calculate the upper bound for a branch and if it cannot exceed the best score so far then don't explore it = 9s.
+- If we can build X on a turn then don't wait and then build it next turn as that cannot produce a better result = 4s.
+- In the video, he then removes the cache as the number of cache misses is the bottleneck but this makes it slower for my version (Elixir vs Rust issue?).
+- Part 2 takes 5s. It's a newer computer than the one used in December, so PyPy3's times now are 8s and 18s for comparison.
+
+
 ## Day 20
 - Part 1: implemented the algorithm using a linked list because a) it is easier than doing the wrap-around maths and b) I suspected it would be needed for part 2.
 - Part 2: the stepsize is huge, but as the list is circular we can use the modulo to reduce it. Took a while for me to realise I needed to take the modulo of the number of nodes - 1 because we have detached the original node!
