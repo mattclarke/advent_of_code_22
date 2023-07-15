@@ -50,8 +50,6 @@ def solve(part_2=False):
             if minute == num_minutes:
                 # One minute left, but not time to build anything else
                 geo += r_geo
-                if geo > result:
-                    print(result, len(q))
                 result = max(result, geo)
                 continue
 
@@ -185,7 +183,6 @@ def solve(part_2=False):
                 )
 
         RESULTS[num] = result
-        print(num, result)
 
     if not part_2:
         result = 0
