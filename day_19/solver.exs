@@ -19,66 +19,93 @@ defmodule Foo do
     robots = {1, 0, 0, 0}
 
     Enum.reduce(recipes, [], fn x, acc ->
-      {result, _} = run_recipe(x, robots, {0, 0, 0, 0}, rounds, %{})
+      {result, _, _} = run_recipe(x, robots, {0, 0, 0, 0}, rounds, %{}, 0)
       [result | acc]
     end)
     |> Enum.reverse()
   end
 
-  defp run_recipe(_, {_, _, _, rgeode}, {_, _, _, geode}, 1, cache) do
-    {geode + rgeode, cache}
+  defp run_recipe(_, {_, _, _, rgeode}, {_, _, _, geode}, 1, cache, max_geodes) do
+    {geode + rgeode, cache, max(max_geodes, geode + rgeode)}
   end
 
-  defp run_recipe(recipe, robots, materials, rounds, cache) do
+  defp run_recipe(recipe, robots, materials, rounds, cache, max_geodes) do
     # IO.inspect({rounds, robots, materials})
     materials = normalise_materials(materials, robots, recipe)
     cache_value = Map.get(cache, generate_cache_key(robots, materials, rounds))
     # Ugly if use 'when' in signiture?
     if cache_value == nil do
-      result = 0
+      max_possible = calculate_max_possible(materials, robots, rounds)
 
-      {result, cache} =
-        if can_build("geode", robots, materials, recipe) do
-          {r, cache} = applesauce("geode", robots, materials, recipe, rounds, cache)
-          {max(result, r), cache}
-        else
-          {result, cache}
-        end
+      if max_possible <= max_geodes do
+        # Cannnot possibly get more so don't go any further
+        {0, cache, max_geodes}
+      else
+        result = 0
 
-      {result, cache} =
-        if can_build("obsidian", robots, materials, recipe) do
-          {r, cache} = applesauce("obsidian", robots, materials, recipe, rounds, cache)
-          {max(result, r), cache}
-        else
-          {result, cache}
-        end
+        {result, cache, max_geodes} =
+          if can_build("geode", robots, materials, recipe) do
+            {r, cache, max_geodes} =
+              applesauce("geode", robots, materials, recipe, rounds, cache, max_geodes)
 
-      {result, cache} =
-        if can_build("clay", robots, materials, recipe) do
-          {r, cache} = applesauce("clay", robots, materials, recipe, rounds, cache)
-          {max(result, r), cache}
-        else
-          {result, cache}
-        end
+            {max(result, r), cache, max_geodes}
+          else
+            {result, cache, max_geodes}
+          end
 
-      {result, cache} =
-        if can_build("ore", robots, materials, recipe) do
-          {r, cache} = applesauce("ore", robots, materials, recipe, rounds, cache)
-          {max(result, r), cache}
-        else
-          {result, cache}
-        end
+        {result, cache, max_geodes} =
+          if can_build("obsidian", robots, materials, recipe) do
+            {r, cache, max_geodes} =
+              applesauce("obsidian", robots, materials, recipe, rounds, cache, max_geodes)
 
-      {r, cache} = run_recipe(recipe, robots, mine(robots, materials), rounds - 1, cache)
-      result = max(result, r)
+            {max(result, r), cache, max_geodes}
+          else
+            {result, cache, max_geodes}
+          end
 
-      materials = normalise_materials(materials, robots, recipe)
-      cache = Map.put(cache, generate_cache_key(robots, materials, rounds), result)
+        {result, cache, max_geodes} =
+          if can_build("clay", robots, materials, recipe) do
+            {r, cache, max_geodes} =
+              applesauce("clay", robots, materials, recipe, rounds, cache, max_geodes)
 
-      {result, cache}
+            {max(result, r), cache, max_geodes}
+          else
+            {result, cache, max_geodes}
+          end
+
+        {result, cache, max_geodes} =
+          if can_build("ore", robots, materials, recipe) do
+            {r, cache, max_geodes} =
+              applesauce("ore", robots, materials, recipe, rounds, cache, max_geodes)
+
+            {max(result, r), cache, max_geodes}
+          else
+            {result, cache, max_geodes}
+          end
+
+        {r, cache, max_geodes} =
+          run_recipe(recipe, robots, mine(robots, materials), rounds - 1, cache, max_geodes)
+
+        result = max(result, r)
+
+        materials = normalise_materials(materials, robots, recipe)
+
+        key = generate_cache_key(robots, materials, rounds)
+        cache =
+          Map.put(cache, key, result)
+
+        {result, cache, max_geodes}
+      end
     else
-      {cache_value, cache}
+      {cache_value, cache, max_geodes}
     end
+  end
+
+  defp calculate_max_possible(materials, robots, rounds) do
+    {_, _, _, geodes} = materials
+    {_, _, _, rgeode} = robots
+    # so far + geodes produced by current + geodes produced if one robot created per remaining round
+    geodes + rgeode * rounds + rounds * (rounds - 1) / 2
   end
 
   defp normalise_materials(materials, robots, recipe) do
@@ -114,10 +141,10 @@ defmodule Foo do
     {ore, clay, obsidian, geode}
   end
 
-  defp applesauce(type, robots, materials, recipe, rounds, cache) do
+  defp applesauce(type, robots, materials, recipe, rounds, cache, max_geodes) do
     materials = mine(robots, materials)
     {robots, materials} = build(type, robots, materials, recipe)
-    run_recipe(recipe, robots, materials, rounds - 1, cache)
+    run_recipe(recipe, robots, materials, rounds - 1, cache, max_geodes)
   end
 
   defp generate_cache_key(robots, materials, rounds) do
