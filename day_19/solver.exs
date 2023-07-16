@@ -56,7 +56,9 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    materials = normalise_materials(materials, robots, state, recipe)
+    state = %{state | materials: materials}
+    state = normalise_materials(robots, state, recipe)
+    materials = state.materials
     cache_value = Map.get(cache, generate_cache_key(robots, materials, state, rounds))
 
     case cache_value do
@@ -203,7 +205,9 @@ defmodule Foo do
 
       result = max(result, r)
 
-      materials = normalise_materials(materials, robots, state, recipe)
+      state = %{state | materials: materials}
+      state = normalise_materials(robots, state, recipe)
+      materials = state.materials
 
       key = generate_cache_key(robots, materials, state, rounds)
       cache = Map.put(cache, key, result)
@@ -220,13 +224,13 @@ defmodule Foo do
     geodes + rgeode * rounds + rounds * (rounds - 1) / 2
   end
 
-  defp normalise_materials(materials, robots, state, recipe) do
+  defp normalise_materials(robots, state, recipe) do
     {max_ore, max_clay, max_obsidian} =
       Enum.reduce(Map.values(recipe), {0, 0, 0}, fn {o, c, ob}, {mo, mc, mob} ->
         {max(mo, o), max(mc, c), max(mob, ob)}
       end)
 
-    {ore, clay, obsidian, geode} = materials
+    {ore, clay, obsidian, geode} = state.materials
     {rore, rclay, robsidian, _} = robots
 
     ore =
@@ -250,7 +254,7 @@ defmodule Foo do
         obsidian
       end
 
-    {ore, clay, obsidian, geode}
+    %{state | materials: {ore, clay, obsidian, geode}}
   end
 
   defp applesauce(
