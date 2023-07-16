@@ -56,9 +56,7 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    state = %{state | materials: materials, robots: robots}
     state = normalise_materials(state, recipe)
-    materials = state.materials
     cache_value = Map.get(cache, generate_cache_key(state, rounds))
 
     case cache_value do
@@ -205,9 +203,7 @@ defmodule Foo do
 
       result = max(result, r)
 
-      state = %{state | materials: materials, robots: robots}
       state = normalise_materials(state, recipe)
-      materials = state.materials
 
       key = generate_cache_key(state, rounds)
       cache = Map.put(cache, key, result)
