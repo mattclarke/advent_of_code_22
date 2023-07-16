@@ -16,11 +16,11 @@ recipes =
 
 defmodule Foo do
   def solve(recipes, rounds) do
-    robots = {1, 0, 0, 0}
     state = create_initial_state()
 
     Enum.reduce(recipes, [], fn x, acc ->
-      {result, _, _} = run_recipe(x, robots, state, rounds, %{}, 0, true, true, true)
+      {result, cache, _} = run_recipe(x, state, rounds, %{contents: %{}, misses: 0, hits: 0}, 0, true, true, true)
+      # IO.puts("hit percentage: #{100 * cache.hits / (cache.hits + cache.misses)}")
       [result | acc]
     end)
     |> Enum.reverse()
@@ -34,8 +34,9 @@ defmodule Foo do
     }
   end
 
-  defp run_recipe(_, {_, _, _, rgeode}, state, 1, cache, max_geodes, _, _, _) do
+  defp run_recipe(_, state, 1, cache, max_geodes, _, _, _) do
     {_, _, _, geode} = state.materials
+    {_, _, _, rgeode} = state.robots
     {geode + rgeode, cache, max(max_geodes, geode + rgeode)}
   end
 
@@ -47,7 +48,6 @@ defmodule Foo do
 
   defp run_recipe(
          recipe,
-         robots,
          state,
          rounds,
          cache,
@@ -57,13 +57,13 @@ defmodule Foo do
          can_build_obsidian
        ) do
     state = normalise_materials(state, recipe)
-    cache_value = Map.get(cache, generate_cache_key(state, rounds))
+    cache_value = Map.get(cache.contents, generate_cache_key(state, rounds))
 
     case cache_value do
       nil ->
+        cache = %{cache | misses: cache.misses + 1}
         explore_branch(
           recipe,
-          robots,
           state,
           rounds,
           cache,
@@ -74,13 +74,13 @@ defmodule Foo do
         )
 
       value ->
+        cache = %{cache | hits: cache.hits + 1}
         {value, cache, max_geodes}
     end
   end
 
   defp explore_branch(
          recipe,
-         robots,
          state,
          rounds,
          cache,
@@ -102,7 +102,6 @@ defmodule Foo do
           {r, cache, max_geodes} =
             applesauce(
               "geode",
-              robots,
               state,
               recipe,
               rounds,
@@ -123,7 +122,6 @@ defmodule Foo do
           {r, cache, max_geodes} =
             applesauce(
               "obsidian",
-              robots,
               state,
               recipe,
               rounds,
@@ -144,7 +142,6 @@ defmodule Foo do
           {r, cache, max_geodes} =
             applesauce(
               "clay",
-              robots,
               state,
               recipe,
               rounds,
@@ -165,7 +162,6 @@ defmodule Foo do
           {r, cache, max_geodes} =
             applesauce(
               "ore",
-              robots,
               state,
               recipe,
               rounds,
@@ -184,7 +180,6 @@ defmodule Foo do
       {r, cache, max_geodes} =
         run_recipe(
           recipe,
-          robots,
           mine(state),
           rounds - 1,
           cache,
@@ -199,7 +194,7 @@ defmodule Foo do
       state = normalise_materials(state, recipe)
 
       key = generate_cache_key(state, rounds)
-      cache = Map.put(cache, key, result)
+      cache = %{cache | contents: Map.put(cache.contents, key, result)}
 
       {result, cache, max_geodes}
     end
@@ -248,7 +243,6 @@ defmodule Foo do
 
   defp applesauce(
          type,
-         robots,
          state,
          recipe,
          rounds,
@@ -262,7 +256,6 @@ defmodule Foo do
 
     run_recipe(
       recipe,
-      state.robots,
       state,
       rounds - 1,
       cache,

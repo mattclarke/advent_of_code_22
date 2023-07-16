@@ -137,7 +137,7 @@ Update July 2023:
 - Throw away materials we don't need to reduce the number of cache states = 22s.
 - Calculate the upper bound for a branch and if it cannot exceed the best score so far then don't explore it = 9s.
 - If we can build X on a turn then don't wait and then build it next turn as that cannot produce a better result = 4s.
-- In the video, he then removes the cache as the number of cache misses is the bottleneck but this makes it slower for my version (Elixir vs Rust issue?).
+- In the video, he then removes the cache as the number of cache misses is the bottleneck but this makes it slower for my version (Elixir vs Rust issue?). His cache hits were ~5% but mine are ~10-30% which is probably because I throw away unrequired materials.
 - Part 2 takes 5s. It's a newer computer than the one used in December, so PyPy3's times now are 8s and 18s for comparison.
 
 
