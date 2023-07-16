@@ -271,12 +271,12 @@ defmodule Foo do
          can_build_obsidian
        ) do
     state = mine(state)
-    {robots, materials} = build(type, state, recipe)
+    state = build(type, state, recipe)
 
     run_recipe(
       recipe,
-      robots,
-      materials,
+      state.robots,
+      state.materials,
       state,
       rounds - 1,
       cache,
@@ -360,7 +360,7 @@ defmodule Foo do
         materials =
           {ore - elem(recipe, 0), clay - elem(recipe, 1), obsidian - elem(recipe, 2), geode}
 
-        {robots, materials}
+        %{state | robots: robots, materials: materials}
 
       "clay" ->
         recipe = recipe.clay
@@ -369,7 +369,7 @@ defmodule Foo do
         materials =
           {ore - elem(recipe, 0), clay - elem(recipe, 1), obsidian - elem(recipe, 2), geode}
 
-        {robots, materials}
+        %{state | robots: robots, materials: materials}
 
       "obsidian" ->
         recipe = recipe.obsidian
@@ -378,7 +378,7 @@ defmodule Foo do
         materials =
           {ore - elem(recipe, 0), clay - elem(recipe, 1), obsidian - elem(recipe, 2), geode}
 
-        {robots, materials}
+        %{state | robots: robots, materials: materials}
 
       "geode" ->
         recipe = recipe.geode
@@ -387,7 +387,7 @@ defmodule Foo do
         materials =
           {ore - elem(recipe, 0), clay - elem(recipe, 1), obsidian - elem(recipe, 2), geode}
 
-        {robots, materials}
+        %{state | robots: robots, materials: materials}
     end
   end
 end
