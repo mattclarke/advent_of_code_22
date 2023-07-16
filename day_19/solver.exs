@@ -17,15 +17,24 @@ recipes =
 defmodule Foo do
   def solve(recipes, rounds) do
     robots = {1, 0, 0, 0}
+    state = create_initial_state()
 
     Enum.reduce(recipes, [], fn x, acc ->
-      {result, _, _} = run_recipe(x, robots, {0, 0, 0, 0}, rounds, %{}, 0, true, true, true)
+      {result, _, _} = run_recipe(x, robots, {0, 0, 0, 0}, state, rounds, %{}, 0, true, true, true)
       [result | acc]
     end)
     |> Enum.reverse()
   end
 
-  defp run_recipe(_, {_, _, _, rgeode}, {_, _, _, geode}, 1, cache, max_geodes, _, _, _) do
+  defp create_initial_state() do
+    %{
+      robots: {1, 0, 0, 0},
+      materials: {0, 0, 0, 0},
+      cache: %{}
+    }
+  end
+
+  defp run_recipe(_, {_, _, _, rgeode}, {_, _, _, geode}, state, 1, cache, max_geodes, _, _, _) do
     {geode + rgeode, cache, max(max_geodes, geode + rgeode)}
   end
 
@@ -39,6 +48,7 @@ defmodule Foo do
          recipe,
          robots,
          materials,
+         state,
          rounds,
          cache,
          max_geodes,
@@ -46,8 +56,8 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    materials = normalise_materials(materials, robots, recipe)
-    cache_value = Map.get(cache, generate_cache_key(robots, materials, rounds))
+    materials = normalise_materials(materials, robots, state, recipe)
+    cache_value = Map.get(cache, generate_cache_key(robots, materials, state, rounds))
 
     case cache_value do
       nil ->
@@ -55,6 +65,7 @@ defmodule Foo do
           recipe,
           robots,
           materials,
+          state,
           rounds,
           cache,
           max_geodes,
@@ -72,6 +83,7 @@ defmodule Foo do
          recipe,
          robots,
          materials,
+         state,
          rounds,
          cache,
          max_geodes,
@@ -79,7 +91,7 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    max_possible = calculate_max_possible(materials, robots, rounds)
+    max_possible = calculate_max_possible(materials, robots, state, rounds)
 
     if max_possible <= max_geodes do
       # Cannnot possibly get more so don't go any further
@@ -88,12 +100,13 @@ defmodule Foo do
       result = 0
 
       {result, cache, max_geodes} =
-        if can_build("geode", robots, materials, recipe) do
+        if can_build("geode", robots, materials, state, recipe) do
           {r, cache, max_geodes} =
             applesauce(
               "geode",
               robots,
               materials,
+              state,
               recipe,
               rounds,
               cache,
@@ -109,12 +122,13 @@ defmodule Foo do
         end
 
       {result, cache, max_geodes, new_can_build_obsidian} =
-        if can_build("obsidian", robots, materials, recipe) and can_build_obsidian do
+        if can_build("obsidian", robots, materials, state, recipe) and can_build_obsidian do
           {r, cache, max_geodes} =
             applesauce(
               "obsidian",
               robots,
               materials,
+              state,
               recipe,
               rounds,
               cache,
@@ -130,12 +144,13 @@ defmodule Foo do
         end
 
       {result, cache, max_geodes, new_can_build_clay} =
-        if can_build("clay", robots, materials, recipe) and can_build_clay do
+        if can_build("clay", robots, materials, state, recipe) and can_build_clay do
           {r, cache, max_geodes} =
             applesauce(
               "clay",
               robots,
               materials,
+              state,
               recipe,
               rounds,
               cache,
@@ -151,12 +166,13 @@ defmodule Foo do
         end
 
       {result, cache, max_geodes, new_can_build_ore} =
-        if can_build("ore", robots, materials, recipe) and can_build_ore do
+        if can_build("ore", robots, materials, state, recipe) and can_build_ore do
           {r, cache, max_geodes} =
             applesauce(
               "ore",
               robots,
               materials,
+              state,
               recipe,
               rounds,
               cache,
@@ -175,7 +191,8 @@ defmodule Foo do
         run_recipe(
           recipe,
           robots,
-          mine(robots, materials),
+          mine(robots, materials, state),
+          state,
           rounds - 1,
           cache,
           max_geodes,
@@ -186,16 +203,16 @@ defmodule Foo do
 
       result = max(result, r)
 
-      materials = normalise_materials(materials, robots, recipe)
+      materials = normalise_materials(materials, robots, state, recipe)
 
-      key = generate_cache_key(robots, materials, rounds)
+      key = generate_cache_key(robots, materials, state, rounds)
       cache = Map.put(cache, key, result)
 
       {result, cache, max_geodes}
     end
   end
 
-  defp calculate_max_possible(materials, robots, rounds) do
+  defp calculate_max_possible(materials, robots, state, rounds) do
     {_, _, _, geodes} = materials
     {_, _, _, rgeode} = robots
 
@@ -203,7 +220,7 @@ defmodule Foo do
     geodes + rgeode * rounds + rounds * (rounds - 1) / 2
   end
 
-  defp normalise_materials(materials, robots, recipe) do
+  defp normalise_materials(materials, robots, state, recipe) do
     {max_ore, max_clay, max_obsidian} =
       Enum.reduce(Map.values(recipe), {0, 0, 0}, fn {o, c, ob}, {mo, mc, mob} ->
         {max(mo, o), max(mc, c), max(mob, ob)}
@@ -240,6 +257,7 @@ defmodule Foo do
          type,
          robots,
          materials,
+         state,
          recipe,
          rounds,
          cache,
@@ -248,13 +266,14 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    materials = mine(robots, materials)
-    {robots, materials} = build(type, robots, materials, recipe)
+    materials = mine(robots, materials, state)
+    {robots, materials} = build(type, robots, materials, state, recipe)
 
     run_recipe(
       recipe,
       robots,
       materials,
+      state,
       rounds - 1,
       cache,
       max_geodes,
@@ -264,11 +283,11 @@ defmodule Foo do
     )
   end
 
-  defp generate_cache_key(robots, materials, rounds) do
+  defp generate_cache_key(robots, materials, state, rounds) do
     {robots, materials, rounds}
   end
 
-  defp can_build(type, robots, materials, recipe) do
+  defp can_build(type, robots, materials, state, recipe) do
     {rore, rclay, robsidian, _} = robots
 
     {recipe, below_limit} =
@@ -319,13 +338,13 @@ defmodule Foo do
     end
   end
 
-  defp mine(robots, materials) do
+  defp mine(robots, materials, state) do
     {rore, rclay, robsidian, rgeode} = robots
     {ore, clay, obsidian, geode} = materials
     {ore + rore, clay + rclay, obsidian + robsidian, geode + rgeode}
   end
 
-  defp build(type, robots, materials, recipe) do
+  defp build(type, robots, materials, state, recipe) do
     {rore, rclay, robsidian, rgeode} = robots
     {ore, clay, obsidian, geode} = materials
 
