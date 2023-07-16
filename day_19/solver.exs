@@ -59,7 +59,7 @@ defmodule Foo do
     state = %{state | materials: materials, robots: robots}
     state = normalise_materials(state, recipe)
     materials = state.materials
-    cache_value = Map.get(cache, generate_cache_key(robots, materials, state, rounds))
+    cache_value = Map.get(cache, generate_cache_key(state, rounds))
 
     case cache_value do
       nil ->
@@ -209,7 +209,7 @@ defmodule Foo do
       state = normalise_materials(state, recipe)
       materials = state.materials
 
-      key = generate_cache_key(robots, materials, state, rounds)
+      key = generate_cache_key(state, rounds)
       cache = Map.put(cache, key, result)
 
       {result, cache, max_geodes}
@@ -287,8 +287,8 @@ defmodule Foo do
     )
   end
 
-  defp generate_cache_key(robots, materials, state, rounds) do
-    {robots, materials, rounds}
+  defp generate_cache_key(state, rounds) do
+    {state.robots, state.materials, rounds}
   end
 
   defp can_build(type, robots, materials, state, recipe) do
