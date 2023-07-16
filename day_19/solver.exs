@@ -193,7 +193,7 @@ defmodule Foo do
         run_recipe(
           recipe,
           robots,
-          mine(robots, materials, state),
+          mine(state),
           state,
           rounds - 1,
           cache,
@@ -270,7 +270,7 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    materials = mine(robots, materials, state)
+    materials = mine(state)
     {robots, materials} = build(type, robots, materials, state, recipe)
 
     run_recipe(
@@ -342,9 +342,9 @@ defmodule Foo do
     end
   end
 
-  defp mine(robots, materials, state) do
-    {rore, rclay, robsidian, rgeode} = robots
-    {ore, clay, obsidian, geode} = materials
+  defp mine(state) do
+    {rore, rclay, robsidian, rgeode} = state.robots
+    {ore, clay, obsidian, geode} = state.materials
     {ore + rore, clay + rclay, obsidian + robsidian, geode + rgeode}
   end
 
