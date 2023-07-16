@@ -102,7 +102,7 @@ defmodule Foo do
       result = 0
 
       {result, cache, max_geodes} =
-        if can_build("geode", robots, materials, state, recipe) do
+        if can_build("geode", state, recipe) do
           {r, cache, max_geodes} =
             applesauce(
               "geode",
@@ -124,7 +124,7 @@ defmodule Foo do
         end
 
       {result, cache, max_geodes, new_can_build_obsidian} =
-        if can_build("obsidian", robots, materials, state, recipe) and can_build_obsidian do
+        if can_build("obsidian", state, recipe) and can_build_obsidian do
           {r, cache, max_geodes} =
             applesauce(
               "obsidian",
@@ -146,7 +146,7 @@ defmodule Foo do
         end
 
       {result, cache, max_geodes, new_can_build_clay} =
-        if can_build("clay", robots, materials, state, recipe) and can_build_clay do
+        if can_build("clay", state, recipe) and can_build_clay do
           {r, cache, max_geodes} =
             applesauce(
               "clay",
@@ -168,7 +168,7 @@ defmodule Foo do
         end
 
       {result, cache, max_geodes, new_can_build_ore} =
-        if can_build("ore", robots, materials, state, recipe) and can_build_ore do
+        if can_build("ore", state, recipe) and can_build_ore do
           {r, cache, max_geodes} =
             applesauce(
               "ore",
@@ -291,8 +291,8 @@ defmodule Foo do
     {state.robots, state.materials, rounds}
   end
 
-  defp can_build(type, robots, materials, state, recipe) do
-    {rore, rclay, robsidian, _} = robots
+  defp can_build(type, state, recipe) do
+    {rore, rclay, robsidian, _} = state.robots
 
     {recipe, below_limit} =
       case type do
@@ -325,7 +325,7 @@ defmodule Foo do
       end
 
     if below_limit do
-      Enum.zip(Tuple.to_list(materials), Tuple.to_list(recipe))
+      Enum.zip(Tuple.to_list(state.materials), Tuple.to_list(recipe))
       |> Enum.reduce(true, fn {m, r}, acc ->
         if acc == false do
           false
