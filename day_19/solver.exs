@@ -271,7 +271,7 @@ defmodule Foo do
          can_build_obsidian
        ) do
     state = mine(state)
-    {robots, materials} = build(type, robots, state.materials, state, recipe)
+    {robots, materials} = build(type, state, recipe)
 
     run_recipe(
       recipe,
@@ -348,7 +348,7 @@ defmodule Foo do
     %{state | materials: {ore + rore, clay + rclay, obsidian + robsidian, geode + rgeode}}
   end
 
-  defp build(type, robots, materials, state, recipe) do
+  defp build(type, state, recipe) do
     {rore, rclay, robsidian, rgeode} = state.robots
     {ore, clay, obsidian, geode} = state.materials
 
