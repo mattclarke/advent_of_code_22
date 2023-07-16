@@ -349,8 +349,8 @@ defmodule Foo do
   end
 
   defp build(type, robots, materials, state, recipe) do
-    {rore, rclay, robsidian, rgeode} = robots
-    {ore, clay, obsidian, geode} = materials
+    {rore, rclay, robsidian, rgeode} = state.robots
+    {ore, clay, obsidian, geode} = state.materials
 
     case type do
       "ore" ->
