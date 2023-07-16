@@ -93,7 +93,7 @@ defmodule Foo do
          can_build_clay,
          can_build_obsidian
        ) do
-    max_possible = calculate_max_possible(materials, robots, state, rounds)
+    max_possible = calculate_max_possible(state, rounds)
 
     if max_possible <= max_geodes do
       # Cannnot possibly get more so don't go any further
@@ -216,9 +216,9 @@ defmodule Foo do
     end
   end
 
-  defp calculate_max_possible(materials, robots, state, rounds) do
-    {_, _, _, geodes} = materials
-    {_, _, _, rgeode} = robots
+  defp calculate_max_possible(state, rounds) do
+    {_, _, _, geodes} = state.materials
+    {_, _, _, rgeode} = state.robots
 
     # so far + geodes produced by current + geodes produced if one robot created per remaining round
     geodes + rgeode * rounds + rounds * (rounds - 1) / 2
