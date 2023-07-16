@@ -20,7 +20,7 @@ defmodule Foo do
     state = create_initial_state()
 
     Enum.reduce(recipes, [], fn x, acc ->
-      {result, _, _} = run_recipe(x, robots, {0, 0, 0, 0}, state, rounds, %{}, 0, true, true, true)
+      {result, _, _} = run_recipe(x, robots, state, rounds, %{}, 0, true, true, true)
       [result | acc]
     end)
     |> Enum.reverse()
@@ -34,7 +34,8 @@ defmodule Foo do
     }
   end
 
-  defp run_recipe(_, {_, _, _, rgeode}, {_, _, _, geode}, state, 1, cache, max_geodes, _, _, _) do
+  defp run_recipe(_, {_, _, _, rgeode}, state, 1, cache, max_geodes, _, _, _) do
+    {_, _, _, geode} = state.materials
     {geode + rgeode, cache, max(max_geodes, geode + rgeode)}
   end
 
@@ -47,7 +48,6 @@ defmodule Foo do
   defp run_recipe(
          recipe,
          robots,
-         materials,
          state,
          rounds,
          cache,
@@ -64,7 +64,6 @@ defmodule Foo do
         explore_branch(
           recipe,
           robots,
-          materials,
           state,
           rounds,
           cache,
@@ -82,7 +81,6 @@ defmodule Foo do
   defp explore_branch(
          recipe,
          robots,
-         materials,
          state,
          rounds,
          cache,
@@ -105,7 +103,6 @@ defmodule Foo do
             applesauce(
               "geode",
               robots,
-              materials,
               state,
               recipe,
               rounds,
@@ -127,7 +124,6 @@ defmodule Foo do
             applesauce(
               "obsidian",
               robots,
-              materials,
               state,
               recipe,
               rounds,
@@ -149,7 +145,6 @@ defmodule Foo do
             applesauce(
               "clay",
               robots,
-              materials,
               state,
               recipe,
               rounds,
@@ -171,7 +166,6 @@ defmodule Foo do
             applesauce(
               "ore",
               robots,
-              materials,
               state,
               recipe,
               rounds,
@@ -191,7 +185,6 @@ defmodule Foo do
         run_recipe(
           recipe,
           robots,
-          mine(state).materials,
           mine(state),
           rounds - 1,
           cache,
@@ -256,7 +249,6 @@ defmodule Foo do
   defp applesauce(
          type,
          robots,
-         materials,
          state,
          recipe,
          rounds,
@@ -271,7 +263,6 @@ defmodule Foo do
     run_recipe(
       recipe,
       state.robots,
-      state.materials,
       state,
       rounds - 1,
       cache,
