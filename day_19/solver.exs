@@ -19,8 +19,10 @@ defmodule Foo do
     state = create_initial_state()
 
     Enum.reduce(recipes, [], fn x, acc ->
-      {result, cache, _} = run_recipe(x, state, rounds, %{contents: %{}, misses: 0, hits: 0}, 0, true, true, true)
-      # IO.puts("cache size: #{map_size(cache.contents)}")
+      {result, _cache, _} =
+        run_recipe(x, state, rounds, %{contents: %{}, misses: 0, hits: 0}, 0, true, true, true)
+
+      # IO.puts("cache size: #{map_size(_cache.contents)}")
       # IO.puts("hit percentage: #{100 * cache.hits / (cache.hits + cache.misses)}")
       [result | acc]
     end)
@@ -63,6 +65,7 @@ defmodule Foo do
     case cache_value do
       nil ->
         cache = %{cache | misses: cache.misses + 1}
+
         explore_branch(
           recipe,
           state,
@@ -98,10 +101,17 @@ defmodule Foo do
     else
       result = 0
 
-      {result, cache, max_geodes, _} = foo("geode", state, cache, rounds, recipe, true, max_geodes, result)
-      {result, cache, max_geodes, new_can_build_obsidian} = foo("obsidian", state, cache, rounds, recipe, can_build_obsidian, max_geodes, result)
-      {result, cache, max_geodes, new_can_build_clay} = foo("clay", state, cache, rounds, recipe, can_build_clay, max_geodes, result)
-      {result, cache, max_geodes, new_can_build_ore} = foo("ore", state, cache, rounds, recipe, can_build_ore, max_geodes, result)
+      {result, cache, max_geodes, _} =
+        foo("geode", state, cache, rounds, recipe, true, max_geodes, result)
+
+      {result, cache, max_geodes, new_can_build_obsidian} =
+        foo("obsidian", state, cache, rounds, recipe, can_build_obsidian, max_geodes, result)
+
+      {result, cache, max_geodes, new_can_build_clay} =
+        foo("clay", state, cache, rounds, recipe, can_build_clay, max_geodes, result)
+
+      {result, cache, max_geodes, new_can_build_ore} =
+        foo("ore", state, cache, rounds, recipe, can_build_ore, max_geodes, result)
 
       {r, cache, max_geodes} =
         run_recipe(
@@ -127,24 +137,25 @@ defmodule Foo do
   end
 
   def foo(type, state, cache, rounds, recipe, can_build_material, max_geodes, result) do
-        if can_build(type, state, recipe) and can_build_material do
-          {r, cache, max_geodes} =
-            applesauce(
-              type,
-              state,
-              recipe,
-              rounds,
-              cache,
-              max_geodes,
-              true,
-              true,
-              true
-            )
+    if can_build(type, state, recipe) and can_build_material do
+      state = state |> mine() |> build(type, recipe)
 
-          {max(result, r), cache, max_geodes, false}
-        else
-          {result, cache, max_geodes, true}
-        end
+      {r, cache, max_geodes} =
+        run_recipe(
+          recipe,
+          state,
+          rounds - 1,
+          cache,
+          max_geodes,
+          true,
+          true,
+          true
+        )
+
+      {max(result, r), cache, max_geodes, false}
+    else
+      {result, cache, max_geodes, true}
+    end
   end
 
   defp calculate_max_possible(state, rounds) do
@@ -172,36 +183,11 @@ defmodule Foo do
   end
 
   defp normalise_single(amount, max_required, num_robots) do
-      if num_robots == max_required and amount > max_required do
-        max_required
-      else
-        amount
-      end
-  end
-
-  defp applesauce(
-         type,
-         state,
-         recipe,
-         rounds,
-         cache,
-         max_geodes,
-         can_build_ore,
-         can_build_clay,
-         can_build_obsidian
-       ) do
-    state = state |> mine() |> build(type, recipe)
-
-    run_recipe(
-      recipe,
-      state,
-      rounds - 1,
-      cache,
-      max_geodes,
-      can_build_ore,
-      can_build_clay,
-      can_build_obsidian
-    )
+    if num_robots == max_required and amount > max_required do
+      max_required
+    else
+      amount
+    end
   end
 
   defp generate_cache_key(state, rounds) do
