@@ -20,6 +20,7 @@ defmodule Foo do
 
     Enum.reduce(recipes, [], fn x, acc ->
       {result, cache, _} = run_recipe(x, state, rounds, %{contents: %{}, misses: 0, hits: 0}, 0, true, true, true)
+      # IO.puts("cache size: #{map_size(cache.contents)}")
       # IO.puts("hit percentage: #{100 * cache.hits / (cache.hits + cache.misses)}")
       [result | acc]
     end)
@@ -217,28 +218,19 @@ defmodule Foo do
     {ore, clay, obsidian, geode} = state.materials
     {rore, rclay, robsidian, _} = state.robots
 
-    ore =
-      if rore == max_ore and ore > max_ore do
-        max_ore
-      else
-        ore
-      end
-
-    clay =
-      if rclay == max_clay and clay > max_clay do
-        max_clay
-      else
-        clay
-      end
-
-    obsidian =
-      if robsidian == max_obsidian and obsidian > max_obsidian do
-        max_obsidian
-      else
-        obsidian
-      end
+    ore = normalise_single(ore, max_ore, rore)
+    clay = normalise_single(clay, max_clay, rclay)
+    obsidian = normalise_single(obsidian, max_obsidian, robsidian)
 
     %{state | materials: {ore, clay, obsidian, geode}}
+  end
+
+  defp normalise_single(amount, max_required, num_robots) do
+      if num_robots == max_required and amount > max_required do
+        max_required
+      else
+        amount
+      end
   end
 
   defp applesauce(
