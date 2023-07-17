@@ -45,9 +45,6 @@ defmodule Foo do
 
   # TODO: try storing the minute in the cache rather than the geodes and then abandon a branch if we
   # hit it later than the cached version.
-  # TODO: create our own cache wrapper, so we can count the number of cache misses.
-  # TODO: continue tidying. Perhaps putting the robot and materials (cache and max_geodes) into the same dict?
-  # TODO: lots of duplication before applesauce
 
   defp run_recipe(
          recipe,
@@ -102,16 +99,16 @@ defmodule Foo do
       result = 0
 
       {result, cache, max_geodes, _} =
-        foo("geode", state, cache, rounds, recipe, true, max_geodes, result)
+        try_to_build("geode", state, cache, rounds, recipe, true, max_geodes, result)
 
       {result, cache, max_geodes, new_can_build_obsidian} =
-        foo("obsidian", state, cache, rounds, recipe, can_build_obsidian, max_geodes, result)
+        try_to_build("obsidian", state, cache, rounds, recipe, can_build_obsidian, max_geodes, result)
 
       {result, cache, max_geodes, new_can_build_clay} =
-        foo("clay", state, cache, rounds, recipe, can_build_clay, max_geodes, result)
+        try_to_build("clay", state, cache, rounds, recipe, can_build_clay, max_geodes, result)
 
       {result, cache, max_geodes, new_can_build_ore} =
-        foo("ore", state, cache, rounds, recipe, can_build_ore, max_geodes, result)
+        try_to_build("ore", state, cache, rounds, recipe, can_build_ore, max_geodes, result)
 
       {r, cache, max_geodes} =
         run_recipe(
@@ -136,7 +133,7 @@ defmodule Foo do
     end
   end
 
-  def foo(type, state, cache, rounds, recipe, can_build_material, max_geodes, result) do
+  def try_to_build(type, state, cache, rounds, recipe, can_build_material, max_geodes, result) do
     if can_build(type, state, recipe) and can_build_material do
       state = state |> mine() |> build(type, recipe)
 
