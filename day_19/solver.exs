@@ -102,7 +102,16 @@ defmodule Foo do
         try_to_build("geode", state, cache, rounds, recipe, true, max_geodes, result)
 
       {result, cache, max_geodes, new_can_build_obsidian} =
-        try_to_build("obsidian", state, cache, rounds, recipe, can_build_obsidian, max_geodes, result)
+        try_to_build(
+          "obsidian",
+          state,
+          cache,
+          rounds,
+          recipe,
+          can_build_obsidian,
+          max_geodes,
+          result
+        )
 
       {result, cache, max_geodes, new_can_build_clay} =
         try_to_build("clay", state, cache, rounds, recipe, can_build_clay, max_geodes, result)
@@ -191,55 +200,74 @@ defmodule Foo do
     {state.robots, state.materials, rounds}
   end
 
-  defp can_build(type, state, recipe) do
-    {rore, rclay, robsidian, _} = state.robots
+  defp can_build("ore", state, recipe) do
+    {num_robots, _, _, _} = state.robots
 
-    {recipe, below_limit} =
-      case type do
-        "ore" ->
-          max_ore =
-            Enum.reduce(Map.values(recipe), 0, fn {o, _, _}, acc ->
-              max(acc, o)
-            end)
-
-          {recipe.ore, rore < max_ore}
-
-        "clay" ->
-          max_clay =
-            Enum.reduce(Map.values(recipe), 0, fn {_, o, _}, acc ->
-              max(acc, o)
-            end)
-
-          {recipe.clay, rclay < max_clay}
-
-        "obsidian" ->
-          max_obsidian =
-            Enum.reduce(Map.values(recipe), 0, fn {_, _, o}, acc ->
-              max(acc, o)
-            end)
-
-          {recipe.obsidian, robsidian < max_obsidian}
-
-        "geode" ->
-          {recipe.geode, true}
-      end
-
-    if below_limit do
-      Enum.zip(Tuple.to_list(state.materials), Tuple.to_list(recipe))
-      |> Enum.reduce(true, fn {m, r}, acc ->
-        if acc == false do
-          false
-        else
-          if m >= r do
-            true
-          else
-            false
-          end
-        end
+    maximum =
+      Enum.reduce(Map.values(recipe), 0, fn {o, _, _}, acc ->
+        max(acc, o)
       end)
-    else
-      false
+
+    case num_robots < maximum do
+      false ->
+        false
+
+      true ->
+        enough_materials(state.materials, recipe.ore)
     end
+  end
+
+  defp can_build("clay", state, recipe) do
+    {_, num_robots, _, _} = state.robots
+
+    maximum =
+      Enum.reduce(Map.values(recipe), 0, fn {_, o, _}, acc ->
+        max(acc, o)
+      end)
+
+    case num_robots < maximum do
+      false ->
+        false
+
+      true ->
+        enough_materials(state.materials, recipe.clay)
+    end
+  end
+
+  defp can_build("obsidian", state, recipe) do
+    {_, _, num_robots, _} = state.robots
+
+    maximum =
+      Enum.reduce(Map.values(recipe), 0, fn {_, _, o}, acc ->
+        max(acc, o)
+      end)
+
+    case num_robots < maximum do
+      false ->
+        false
+
+      true ->
+        enough_materials(state.materials, recipe.obsidian)
+    end
+  end
+
+  defp can_build("geode", state, recipe) do
+    enough_materials(state.materials, recipe.geode)
+  end
+
+  defp enough_materials(materials, recipe) do
+    Enum.zip(Tuple.to_list(materials), Tuple.to_list(recipe))
+    |> Enum.reduce(true, fn {m, r}, acc ->
+      if acc == false do
+        false
+      else
+        if m >= r do
+          true
+        else
+          false
+        end
+      end
+    end)
   end
 
   defp mine(state) do
