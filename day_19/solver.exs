@@ -98,85 +98,10 @@ defmodule Foo do
     else
       result = 0
 
-      {result, cache, max_geodes} =
-        if can_build("geode", state, recipe) do
-          {r, cache, max_geodes} =
-            applesauce(
-              "geode",
-              state,
-              recipe,
-              rounds,
-              cache,
-              max_geodes,
-              true,
-              true,
-              true
-            )
-
-          {max(result, r), cache, max_geodes}
-        else
-          {result, cache, max_geodes}
-        end
-
-      {result, cache, max_geodes, new_can_build_obsidian} =
-        if can_build("obsidian", state, recipe) and can_build_obsidian do
-          {r, cache, max_geodes} =
-            applesauce(
-              "obsidian",
-              state,
-              recipe,
-              rounds,
-              cache,
-              max_geodes,
-              true,
-              true,
-              true
-            )
-
-          {max(result, r), cache, max_geodes, false}
-        else
-          {result, cache, max_geodes, true}
-        end
-
-      {result, cache, max_geodes, new_can_build_clay} =
-        if can_build("clay", state, recipe) and can_build_clay do
-          {r, cache, max_geodes} =
-            applesauce(
-              "clay",
-              state,
-              recipe,
-              rounds,
-              cache,
-              max_geodes,
-              true,
-              true,
-              true
-            )
-
-          {max(result, r), cache, max_geodes, false}
-        else
-          {result, cache, max_geodes, true}
-        end
-
-      {result, cache, max_geodes, new_can_build_ore} =
-        if can_build("ore", state, recipe) and can_build_ore do
-          {r, cache, max_geodes} =
-            applesauce(
-              "ore",
-              state,
-              recipe,
-              rounds,
-              cache,
-              max_geodes,
-              true,
-              true,
-              true
-            )
-
-          {max(result, r), cache, max_geodes, false}
-        else
-          {result, cache, max_geodes, true}
-        end
+      {result, cache, max_geodes, _} = foo("geode", state, cache, rounds, recipe, true, max_geodes, result)
+      {result, cache, max_geodes, new_can_build_obsidian} = foo("obsidian", state, cache, rounds, recipe, can_build_obsidian, max_geodes, result)
+      {result, cache, max_geodes, new_can_build_clay} = foo("clay", state, cache, rounds, recipe, can_build_clay, max_geodes, result)
+      {result, cache, max_geodes, new_can_build_ore} = foo("ore", state, cache, rounds, recipe, can_build_ore, max_geodes, result)
 
       {r, cache, max_geodes} =
         run_recipe(
@@ -199,6 +124,27 @@ defmodule Foo do
 
       {result, cache, max_geodes}
     end
+  end
+
+  def foo(type, state, cache, rounds, recipe, can_build_material, max_geodes, result) do
+        if can_build(type, state, recipe) and can_build_material do
+          {r, cache, max_geodes} =
+            applesauce(
+              type,
+              state,
+              recipe,
+              rounds,
+              cache,
+              max_geodes,
+              true,
+              true,
+              true
+            )
+
+          {max(result, r), cache, max_geodes, false}
+        else
+          {result, cache, max_geodes, true}
+        end
   end
 
   defp calculate_max_possible(state, rounds) do
