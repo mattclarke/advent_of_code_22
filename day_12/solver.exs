@@ -29,90 +29,87 @@ input_data = Map.put(input_data, end_point, 25)
 
 defmodule Foo do
   def solve(input_data, start_point, end_point) do
-    explore(start_point, input_data, end_point, 0, MapSet.new())
+    explore([{start_point, 0}], input_data, end_point, %{start_point => 0})
   end
 
-  defp explore(position, _, end_point, num_steps, _) when position == end_point do
-    num_steps
+  defp explore([], _, _, seen) do
+    seen
   end
 
-  defp explore(position, input_data, end_point, num_steps, seen) do
-    IO.inspect(num_steps)
-    seen = MapSet.put(seen, position)
-    result = 1_000_000
+  defp explore([head | tail], input_data, end_point, seen) do
+    {{c, r}, count} = head
 
-    result =
-      if can_move_north?(position, input_data, seen) do
-        {c, r} = position
-        min(result, explore({c, r - 1}, input_data, end_point, num_steps + 1, seen))
+    # if {c, r} == end_point do
+    #   IO.inspect(count)
+    # end
+
+    {tail, seen} =
+      if can_move_north?({c, r}, input_data, count, seen) do
+        {tail ++ [{{c, r - 1}, count + 1}], Map.put(seen, {c, r - 1}, count + 1)}
       else
-        result
+        {tail, seen}
       end
 
-    result =
-      if can_move_south?(position, input_data, seen) do
-        {c, r} = position
-        min(result, explore({c, r + 1}, input_data, end_point, num_steps + 1, seen))
+    {tail, seen} =
+      if can_move_south?({c, r}, input_data, count, seen) do
+        {tail ++ [{{c, r + 1}, count + 1}], Map.put(seen, {c, r + 1}, count + 1)}
       else
-        result
+        {tail, seen}
       end
 
-    result =
-      if can_move_east?(position, input_data, seen) do
-        {c, r} = position
-        min(result, explore({c + 1, r}, input_data, end_point, num_steps + 1, seen))
+    {tail, seen} =
+      if can_move_east?({c, r}, input_data, count, seen) do
+        {tail ++ [{{c + 1, r}, count + 1}], Map.put(seen, {c + 1, r}, count + 1)}
       else
-        result
+        {tail, seen}
       end
 
-    result =
-      if can_move_west?(position, input_data, seen) do
-        {c, r} = position
-        min(result, explore({c - 1, r}, input_data, end_point, num_steps + 1, seen))
+    {tail, seen} =
+      if can_move_west?({c, r}, input_data, count, seen) do
+        {tail ++ [{{c - 1, r}, count + 1}], Map.put(seen, {c - 1, r}, count + 1)}
       else
-        result
+        {tail, seen}
       end
 
-    result
+    explore(tail, input_data, end_point, seen)
   end
 
-  defp can_move_north?({c, r}, input_data, seen) do
+  defp can_move_north?({c, r}, input_data, num_steps, seen) do
     cond do
       !Map.has_key?(input_data, {c, r - 1}) -> false
-      MapSet.member?(seen, {c, r - 1}) -> false
+      Map.get(seen, {c, r - 1}, 1_000_000) <= num_steps + 1 -> false
       Map.get(input_data, {c, r - 1}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 
-  defp can_move_south?({c, r}, input_data, seen) do
+  defp can_move_south?({c, r}, input_data, num_steps, seen) do
     cond do
       !Map.has_key?(input_data, {c, r + 1}) -> false
-      MapSet.member?(seen, {c, r + 1}) -> false
+      Map.get(seen, {c, r + 1}, 1_000_000) <= num_steps + 1 -> false
       Map.get(input_data, {c, r + 1}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 
-  defp can_move_east?({c, r}, input_data, seen) do
+  defp can_move_east?({c, r}, input_data, num_steps, seen) do
     cond do
       !Map.has_key?(input_data, {c + 1, r}) -> false
-      MapSet.member?(seen, {c + 1, r}) -> false
+      Map.get(seen, {c + 1, r}, 1_000_000) <= num_steps + 1 -> false
       Map.get(input_data, {c + 1, r}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 
-  defp can_move_west?({c, r}, input_data, seen) do
+  defp can_move_west?({c, r}, input_data, num_steps, seen) do
     cond do
       !Map.has_key?(input_data, {c - 1, r}) -> false
-      MapSet.member?(seen, {c - 1, r}) -> false
+      Map.get(seen, {c - 1, r}, 1_000_000) <= num_steps + 1 -> false
       Map.get(input_data, {c - 1, r}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 end
 
-result = Foo.solve(input_data, start_point, end_point)
-
+result = Map.get(Foo.solve(input_data, start_point, end_point), end_point)
 IO.puts("Answer to part 1 = #{result}")
