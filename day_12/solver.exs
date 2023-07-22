@@ -28,8 +28,20 @@ input_data = Map.put(input_data, start_point, 0)
 input_data = Map.put(input_data, end_point, 25)
 
 defmodule Foo do
-  def solve(input_data, start_point, end_point) do
-    explore([{start_point, 0}], input_data, end_point, %{start_point => 0})
+  def solve(input_data, start_points, end_point) do
+    starts =
+      Enum.reduce(start_points, [], fn x, acc ->
+        [{x, 0} | acc]
+      end)
+
+    seen =
+      start_points
+      |> Enum.map(fn x ->
+        {x, 0}
+      end)
+      |> Enum.into(%{})
+
+    explore(starts, input_data, end_point, seen)
   end
 
   defp explore([], _, _, seen) do
@@ -38,10 +50,6 @@ defmodule Foo do
 
   defp explore([head | tail], input_data, end_point, seen) do
     {{c, r}, count} = head
-
-    # if {c, r} == end_point do
-    #   IO.inspect(count)
-    # end
 
     {tail, seen} =
       if can_move_north?({c, r}, input_data, count, seen) do
@@ -111,5 +119,18 @@ defmodule Foo do
   end
 end
 
-result = Map.get(Foo.solve(input_data, start_point, end_point), end_point)
+result = Map.get(Foo.solve(input_data, [start_point], end_point), end_point)
 IO.puts("Answer to part 1 = #{result}")
+
+start_points =
+  input_data
+  |> Enum.filter(fn {_, v} ->
+    v == 0
+  end)
+  |> Enum.map(fn {k, _} ->
+    k
+  end)
+  |> Enum.to_list()
+
+result = Map.get(Foo.solve(input_data, start_points, end_point), end_point)
+IO.puts("Answer to part 2 = #{result}")
