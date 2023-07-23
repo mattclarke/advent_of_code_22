@@ -78,37 +78,26 @@ defmodule Foo do
   end
 
   defp can_move_north?({c, r}, input_data, seen) do
-    cond do
-      !Map.has_key?(input_data, {c, r - 1}) -> false
-      MapSet.member?(seen, {c, r - 1}) -> false
-      Map.get(input_data, {c, r - 1}) - Map.get(input_data, {c, r}) > 1 -> false
-      true -> true
-    end
+    can_move({c, r}, {c, r - 1}, input_data, seen)
   end
 
   defp can_move_south?({c, r}, input_data, seen) do
-    cond do
-      !Map.has_key?(input_data, {c, r + 1}) -> false
-      MapSet.member?(seen, {c, r + 1}) -> false
-      Map.get(input_data, {c, r + 1}) - Map.get(input_data, {c, r}) > 1 -> false
-      true -> true
-    end
+    can_move({c, r}, {c, r + 1}, input_data, seen)
   end
 
   defp can_move_east?({c, r}, input_data, seen) do
-    cond do
-      !Map.has_key?(input_data, {c + 1, r}) -> false
-      MapSet.member?(seen, {c + 1, r}) -> false
-      Map.get(input_data, {c + 1, r}) - Map.get(input_data, {c, r}) > 1 -> false
-      true -> true
-    end
+    can_move({c, r}, {c + 1, r}, input_data, seen)
   end
 
   defp can_move_west?({c, r}, input_data, seen) do
+    can_move({c, r}, {c - 1, r}, input_data, seen)
+  end
+
+  defp can_move(current_pos, new_pos, input_data, seen) do
     cond do
-      !Map.has_key?(input_data, {c - 1, r}) -> false
-      MapSet.member?(seen, {c - 1, r}) -> false
-      Map.get(input_data, {c - 1, r}) - Map.get(input_data, {c, r}) > 1 -> false
+      !Map.has_key?(input_data, new_pos) -> false
+      MapSet.member?(seen, new_pos) -> false
+      Map.get(input_data, new_pos) - Map.get(input_data, current_pos) > 1 -> false
       true -> true
     end
   end
