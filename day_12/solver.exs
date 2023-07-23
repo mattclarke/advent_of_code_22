@@ -47,52 +47,18 @@ defmodule Foo do
     {{c, r}, count} = head
 
     {tail, seen} =
-      if can_move_north?({c, r}, input_data, seen) do
-        {tail ++ [{{c, r - 1}, count + 1}], MapSet.put(seen, {c, r - 1})}
-      else
-        {tail, seen}
-      end
-
-    {tail, seen} =
-      if can_move_south?({c, r}, input_data, seen) do
-        {tail ++ [{{c, r + 1}, count + 1}], MapSet.put(seen, {c, r + 1})}
-      else
-        {tail, seen}
-      end
-
-    {tail, seen} =
-      if can_move_east?({c, r}, input_data, seen) do
-        {tail ++ [{{c + 1, r}, count + 1}], MapSet.put(seen, {c + 1, r})}
-      else
-        {tail, seen}
-      end
-
-    {tail, seen} =
-      if can_move_west?({c, r}, input_data, seen) do
-        {tail ++ [{{c - 1, r}, count + 1}], MapSet.put(seen, {c - 1, r})}
-      else
-        {tail, seen}
-      end
+      [{c, r - 1}, {c, r + 1}, {c + 1, r}, {c - 1, r}]
+      |> Enum.reduce({tail, seen}, fn new_pos, {new_tail, new_seen} ->
+        if can_move({c, r}, new_pos, input_data, seen) do
+        {new_tail ++ [{new_pos, count + 1}], MapSet.put(new_seen, new_pos)}
+        else
+          {new_tail, new_seen}
+        end
+      end)
 
     explore(tail, input_data, end_point, seen)
   end
-
-  defp can_move_north?({c, r}, input_data, seen) do
-    can_move({c, r}, {c, r - 1}, input_data, seen)
-  end
-
-  defp can_move_south?({c, r}, input_data, seen) do
-    can_move({c, r}, {c, r + 1}, input_data, seen)
-  end
-
-  defp can_move_east?({c, r}, input_data, seen) do
-    can_move({c, r}, {c + 1, r}, input_data, seen)
-  end
-
-  defp can_move_west?({c, r}, input_data, seen) do
-    can_move({c, r}, {c - 1, r}, input_data, seen)
-  end
-
+  
   defp can_move(current_pos, new_pos, input_data, seen) do
     cond do
       !Map.has_key?(input_data, new_pos) -> false
