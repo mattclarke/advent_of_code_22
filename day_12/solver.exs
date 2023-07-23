@@ -34,47 +34,42 @@ defmodule Foo do
         [{x, 0} | acc]
       end)
 
-    seen =
-      start_points
-      |> Enum.map(fn x ->
-        {x, 0}
-      end)
-      |> Enum.into(%{})
+    seen = MapSet.new(start_points)
 
     explore(starts, input_data, end_point, seen)
   end
 
-  defp explore([], _, _, seen) do
-    seen
+  defp explore([{pos, count} | _], _, end_point, _) when pos == end_point do
+    count
   end
 
   defp explore([head | tail], input_data, end_point, seen) do
     {{c, r}, count} = head
 
     {tail, seen} =
-      if can_move_north?({c, r}, input_data, count, seen) do
-        {tail ++ [{{c, r - 1}, count + 1}], Map.put(seen, {c, r - 1}, count + 1)}
+      if can_move_north?({c, r}, input_data, seen) do
+        {tail ++ [{{c, r - 1}, count + 1}], MapSet.put(seen, {c, r - 1})}
       else
         {tail, seen}
       end
 
     {tail, seen} =
-      if can_move_south?({c, r}, input_data, count, seen) do
-        {tail ++ [{{c, r + 1}, count + 1}], Map.put(seen, {c, r + 1}, count + 1)}
+      if can_move_south?({c, r}, input_data, seen) do
+        {tail ++ [{{c, r + 1}, count + 1}], MapSet.put(seen, {c, r + 1})}
       else
         {tail, seen}
       end
 
     {tail, seen} =
-      if can_move_east?({c, r}, input_data, count, seen) do
-        {tail ++ [{{c + 1, r}, count + 1}], Map.put(seen, {c + 1, r}, count + 1)}
+      if can_move_east?({c, r}, input_data, seen) do
+        {tail ++ [{{c + 1, r}, count + 1}], MapSet.put(seen, {c + 1, r})}
       else
         {tail, seen}
       end
 
     {tail, seen} =
-      if can_move_west?({c, r}, input_data, count, seen) do
-        {tail ++ [{{c - 1, r}, count + 1}], Map.put(seen, {c - 1, r}, count + 1)}
+      if can_move_west?({c, r}, input_data, seen) do
+        {tail ++ [{{c - 1, r}, count + 1}], MapSet.put(seen, {c - 1, r})}
       else
         {tail, seen}
       end
@@ -82,44 +77,44 @@ defmodule Foo do
     explore(tail, input_data, end_point, seen)
   end
 
-  defp can_move_north?({c, r}, input_data, num_steps, seen) do
+  defp can_move_north?({c, r}, input_data, seen) do
     cond do
       !Map.has_key?(input_data, {c, r - 1}) -> false
-      Map.get(seen, {c, r - 1}, 1_000_000) <= num_steps + 1 -> false
+      MapSet.member?(seen, {c, r - 1}) -> false
       Map.get(input_data, {c, r - 1}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 
-  defp can_move_south?({c, r}, input_data, num_steps, seen) do
+  defp can_move_south?({c, r}, input_data, seen) do
     cond do
       !Map.has_key?(input_data, {c, r + 1}) -> false
-      Map.get(seen, {c, r + 1}, 1_000_000) <= num_steps + 1 -> false
+      MapSet.member?(seen, {c, r + 1}) -> false
       Map.get(input_data, {c, r + 1}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 
-  defp can_move_east?({c, r}, input_data, num_steps, seen) do
+  defp can_move_east?({c, r}, input_data, seen) do
     cond do
       !Map.has_key?(input_data, {c + 1, r}) -> false
-      Map.get(seen, {c + 1, r}, 1_000_000) <= num_steps + 1 -> false
+      MapSet.member?(seen, {c + 1, r}) -> false
       Map.get(input_data, {c + 1, r}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 
-  defp can_move_west?({c, r}, input_data, num_steps, seen) do
+  defp can_move_west?({c, r}, input_data, seen) do
     cond do
       !Map.has_key?(input_data, {c - 1, r}) -> false
-      Map.get(seen, {c - 1, r}, 1_000_000) <= num_steps + 1 -> false
+      MapSet.member?(seen, {c - 1, r}) -> false
       Map.get(input_data, {c - 1, r}) - Map.get(input_data, {c, r}) > 1 -> false
       true -> true
     end
   end
 end
 
-result = Map.get(Foo.solve(input_data, [start_point], end_point), end_point)
+result = Foo.solve(input_data, [start_point], end_point)
 IO.puts("Answer to part 1 = #{result}")
 
 start_points =
@@ -132,5 +127,5 @@ start_points =
   end)
   |> Enum.to_list()
 
-result = Map.get(Foo.solve(input_data, start_points, end_point), end_point)
+result = Foo.solve(input_data, start_points, end_point)
 IO.puts("Answer to part 2 = #{result}")
