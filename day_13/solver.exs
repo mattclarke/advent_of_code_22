@@ -10,8 +10,6 @@ input_data =
     {result, _} = Code.eval_string(x)
     result
   end)
-  |> Enum.chunk_every(2)
-  |> Enum.map(&List.to_tuple/1)
 
 defmodule Foo do
   def solve(first, second) do
@@ -59,6 +57,8 @@ end
 
 result =
   input_data
+  |> Enum.chunk_every(2)
+  |> Enum.map(&List.to_tuple/1)
   |> Enum.map(fn {first, second} ->
     Foo.solve(first, second)
   end)
@@ -73,4 +73,20 @@ result =
 
 IO.puts("Answer to part 1 = #{result}")
 
-# IO.puts("Answer to part 2 = #{result}")
+input_data = [[[2]], [[6]]] ++ input_data
+
+result =
+  input_data
+  |> Enum.sort(&Foo.solve/2)
+  |> Enum.with_index(1)
+  |> Enum.filter(fn {v, _} ->
+    v == [[2]] or v == [[6]]
+  end)
+  |> Enum.map(fn {_, i} ->
+    i
+  end)
+  |> Enum.reduce(1, fn x, acc ->
+    acc * x
+  end)
+
+IO.puts("Answer to part 2 = #{result}")
