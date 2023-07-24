@@ -15,29 +15,54 @@ input_data =
   end)
 
 defmodule Foo do
-  def solve(origin, rocks) do
+  @origin {500, 0}
+
+  def solve1(rocks) do
     lowest =
       rocks
       |> Stream.map(&elem(&1, 1))
       |> Enum.max()
 
-    end_condition = fn {_, y} ->
+    end_condition = fn {_, y}, _ ->
       y >= lowest
     end
 
-    special_rule = fn _ -> false end
-
-    drop_grain(origin, end_condition, rocks, 0, special_rule)
+    drop_grain(@origin, end_condition, rocks, 0)
   end
 
-  defp drop_grain(position = {x, y}, end_condition, rocks, count, special_rule) do
+  def solve2(rocks) do
+    lowest =
+      rocks
+      |> Stream.map(&elem(&1, 1))
+      |> Enum.max()
+
+    end_condition = fn _, rocks ->
+      MapSet.member?(rocks, @origin)
+    end
+
+    infinite_floor = fn {_, y} -> y == lowest + 1 end
+
+    drop_grain(@origin, end_condition, rocks, 0, infinite_floor)
+  end
+
+  defp drop_grain(
+         position = {x, y},
+         end_condition,
+         rocks,
+         count,
+         special_rule \\ fn _ -> false end
+       ) do
     below = {x, y + 1}
     below_left = {x - 1, y + 1}
     below_right = {x + 1, y + 1}
 
     cond do
-      end_condition.(position) ->
+      end_condition.(position, rocks) ->
         count
+
+      special_rule.(position) ->
+        rocks = MapSet.put(rocks, position)
+        drop_grain(@origin, end_condition, rocks, count + 1, special_rule)
 
       !MapSet.member?(rocks, below) ->
         drop_grain(below, end_condition, rocks, count, special_rule)
@@ -50,7 +75,7 @@ defmodule Foo do
 
       true ->
         rocks = MapSet.put(rocks, position)
-        drop_grain({500, 0}, end_condition, rocks, count + 1, special_rule)
+        drop_grain(@origin, end_condition, rocks, count + 1, special_rule)
     end
   end
 
@@ -79,8 +104,10 @@ rocks =
     Foo.find_rocks(x, acc)
   end)
 
-result = Foo.solve({500, 0}, rocks)
+result = Foo.solve1(rocks)
 
 IO.puts("Answer to part 1 = #{result}")
 
-# IO.puts("Answer to part 2 = #{result}")
+result = Foo.solve2(rocks)
+
+IO.puts("Answer to part 2 = #{result}")
