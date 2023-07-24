@@ -25,10 +25,12 @@ defmodule Foo do
       y >= lowest
     end
 
-    drop_grain(origin, end_condition, rocks, 0)
+    special_rule = fn _ -> false end
+
+    drop_grain(origin, end_condition, rocks, 0, special_rule)
   end
 
-  defp drop_grain(position = {x, y}, end_condition, rocks, count) do
+  defp drop_grain(position = {x, y}, end_condition, rocks, count, special_rule) do
     below = {x, y + 1}
     below_left = {x - 1, y + 1}
     below_right = {x + 1, y + 1}
@@ -38,17 +40,17 @@ defmodule Foo do
         count
 
       !MapSet.member?(rocks, below) ->
-        drop_grain(below, end_condition, rocks, count)
+        drop_grain(below, end_condition, rocks, count, special_rule)
 
       !MapSet.member?(rocks, below_left) ->
-        drop_grain(below_left, end_condition, rocks, count)
+        drop_grain(below_left, end_condition, rocks, count, special_rule)
 
       !MapSet.member?(rocks, below_right) ->
-        drop_grain(below_right, end_condition, rocks, count)
+        drop_grain(below_right, end_condition, rocks, count, special_rule)
 
       true ->
         rocks = MapSet.put(rocks, position)
-        drop_grain({500, 0}, end_condition, rocks, count + 1)
+        drop_grain({500, 0}, end_condition, rocks, count + 1, special_rule)
     end
   end
 
