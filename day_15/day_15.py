@@ -1,4 +1,3 @@
-import copy
 import sys
 
 
@@ -96,9 +95,6 @@ for r in range(0, 4000000):
                 c = cmax + 1
                 inrange = True
                 break
-            if (c, r) in sensors or (c, r) in beacons:
-                c += 1
-                inrange = True
         if not inrange:
             result = 4000000 * c + r
             break
