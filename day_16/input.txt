@@ -56,4 +56,3 @@ Valve MR has flow rate=3; tunnels lead to valves LK, IL, QL, SU, PC
 Valve PI has flow rate=0; tunnels lead to valves IR, IP
 Valve CX has flow rate=0; tunnels lead to valves VM, PK
 Valve SU has flow rate=0; tunnels lead to valves YL, MR
-

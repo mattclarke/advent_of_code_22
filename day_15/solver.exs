@@ -5,12 +5,10 @@ input_data =
   |> Stream.map(&String.replace(&1, "\n", ""))
   |> Enum.map(fn x ->
     x
-    |> String.replace("Sensor at x=", "")
-    |> String.replace(" y=", "")
-    |> String.replace(": closest beacon is at x=", ",")
-    |> String.split(",")
-    |> Stream.map(&String.to_integer/1)
-    |> Stream.chunk_every(2)
+    |> String.split(["=", ",", ":"])
+    |> Enum.filter(&String.match?(&1, ~r/^[-0-9]+$/))
+    |> Enum.map(&String.to_integer/1)
+    |> Enum.chunk_every(2)
     |> Enum.map(&List.to_tuple/1)
   end)
 
