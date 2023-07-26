@@ -108,6 +108,9 @@ Note: it doesn't work for the example because I can open all the valves before c
 
 - Neatest internet solution seems to be to use DP, and for part 2 split the 'available' valves in two (one for the elephant and one for me) and run the code for part 1 twice for all combinations to get the highest score.
 
+Update July 2023:
+- Rerunning part 1 but for 26 minutes using DP gives us a cache of possible valve states against total pressure. If we keep this cache and select the entries with the best pressure for a particular set of valves then we can find the best pair of unique valve sets which gives us our answer!
+
 ## Day 17
 - Part 1: implement the "game" - took me a while to do this!
 - Part 2: target to big to simulate, but after the simulation settles down the height increase per shape repeats. The repetition allows the answer to be derived mathematically, see the code for details.

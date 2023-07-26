@@ -49,7 +49,6 @@ for o in CAN_OPEN:
 result = 0
 q = []
 heappush(q, (0, 0, 1, "AA", [], 0))
-best = {}
 
 while q:
     press, toadd, minute, curr, state, dist = heappop(q)
