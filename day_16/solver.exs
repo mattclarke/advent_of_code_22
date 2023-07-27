@@ -32,28 +32,40 @@ defmodule Foo do
 
       {max_score, cache} =
         if MapSet.member?(openable, current) do
-          opened = opened ++ [current]
-          score = score + flow * (minute - 1)
-          openable = MapSet.delete(openable, current)
+          {opened, openable, score} = open_valve(current, opened, openable, score, minute, flow)
 
-          {new_score, cache} =
-            explore(current, input_data, score, opened, cache, minute - 1, openable)
-
-          {max(new_score, max_score), cache}
+          explore_tunnels(
+            [current],
+            input_data,
+            cache,
+            opened,
+            openable,
+            minute,
+            score,
+            max_score
+          )
         else
           {max_score, cache}
         end
 
       {max_score, cache} =
-        tunnels
-        |> Enum.reduce({max_score, cache}, fn x, {max_score, cache} ->
-          {new_score, cache} = explore(x, input_data, score, opened, cache, minute - 1, openable)
-          {max(new_score, max_score), cache}
-        end)
+        explore_tunnels(tunnels, input_data, cache, opened, openable, minute, score, max_score)
 
       cache = Map.put(cache, {current, opened, minute}, max_score)
       {score, cache}
     end
+  end
+
+  def open_valve(current, opened, openable, score, minute, flow) do
+    {opened ++ [current], MapSet.delete(openable, current), score + flow * (minute - 1)}
+  end
+
+  def explore_tunnels(tunnels, input_data, cache, opened, openable, minute, score, max_score) do
+    tunnels
+    |> Enum.reduce({max_score, cache}, fn x, {max_score, cache} ->
+      {new_score, cache} = explore(x, input_data, score, opened, cache, minute - 1, openable)
+      {max(new_score, max_score), cache}
+    end)
   end
 
   def solve2(cache) do
@@ -61,7 +73,7 @@ defmodule Foo do
     find_best_combination(keys, tl(keys), cache, 0)
   end
 
-  def find_best_combination([_head | tail], _, _, best) when length(tail) == 0 do
+  def find_best_combination([_head | []], _, _, best) do
     best
   end
 
@@ -69,13 +81,10 @@ defmodule Foo do
     find_best_combination(tail, tl(tail), cache, best)
   end
 
-  def find_best_combination(first, [head | tail], cache, best) do
-    valves1 = hd(first)
-    pressure1 = Map.get(cache, hd(first))
-    valves2 = head
-    pressure2 = Map.get(cache, head)
-
+  def find_best_combination(first = [valves1 | _], [valves2 | tail], cache, best) do
     if MapSet.intersection(valves1, valves2) == MapSet.new() do
+      pressure1 = Map.get(cache, valves1)
+      pressure2 = Map.get(cache, valves2)
       find_best_combination(first, tail, cache, max(best, pressure1 + pressure2))
     else
       find_best_combination(first, tail, cache, best)

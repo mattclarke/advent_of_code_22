@@ -110,6 +110,7 @@ Note: it doesn't work for the example because I can open all the valves before c
 
 Update July 2023:
 - Rerunning part 1 but for 26 minutes using DP gives us a cache of possible valve states against total pressure. If we keep this cache and select the entries with the best pressure for a particular set of valves then we can find the best pair of unique valve sets which gives us our answer!
+- Currently doesn't work for the example...
 
 ## Day 17
 - Part 1: implement the "game" - took me a while to do this!
