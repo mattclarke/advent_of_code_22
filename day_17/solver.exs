@@ -1,4 +1,4 @@
-file = "input.txt"
+file = "ex1.txt"
 
 input_data =
   File.stream!(file)
@@ -9,15 +9,21 @@ input_data =
 defmodule Foo do
   @width 7
   @shapes {
-    %{name: "horizontal bar", coords: [{0, 0}, {1, 0}, {2, 0}, {3, 0}], width: 4},
-    %{name: "cross", coords: [{1, 0}, {0, 1}, {1, 1}, {2, 1}, {1, 2}], width: 3},
-    %{name: "l-shape", coords: [{0, 0}, {1, 0}, {2, 0}, {2, 1}, {2, 2}], width: 3},
-    %{name: "vertical bar", coords: [{0, 0}, {0, 1}, {0, 2}, {0, 3}], width: 1},
-    %{name: "square", coords: [{0, 0}, {1, 0}, {0, 1}, {1, 1}], width: 2}
+    %{name: "horizontal bar", coords: [{0, 0}, {1, 0}, {2, 0}, {3, 0}], width: 4, height: 1},
+    %{name: "cross", coords: [{1, 0}, {0, 1}, {1, 1}, {2, 1}, {1, 2}], width: 3, height: 3},
+    %{name: "l-shape", coords: [{0, 0}, {1, 0}, {2, 0}, {2, 1}, {2, 2}], width: 3, height: 3},
+    %{name: "vertical bar", coords: [{0, 0}, {0, 1}, {0, 2}, {0, 3}], width: 1, height: 4},
+    %{name: "square", coords: [{0, 0}, {1, 0}, {0, 1}, {1, 1}], width: 2, height: 2}
   }
 
   def solve1(input_data) do
-    state = %{highest: 0, layout: MapSet.new()}
+    # Create a shape to represent the floor, so can use standard block collision to find floor
+    initial_mapset =
+      Enum.reduce(0..(@width - 1), MapSet.new(), fn x, acc ->
+        MapSet.put(acc, {x, -1})
+      end)
+
+    state = %{highest: 0, layout: initial_mapset}
 
     Enum.reduce(0..2022, {0, state}, fn i, {wind_index, current_state} ->
       place_new_shape(input_data, i, wind_index, current_state)
@@ -34,13 +40,14 @@ defmodule Foo do
     wind_direction = String.at(input_data, wind_index)
 
     x = apply_wind(x, y, wind_direction, shape, state)
+
     {moved_down, y} = try_moving_down(x, y, shape, state)
 
     if !moved_down do
       new_state =
         Enum.reduce(shape.coords, state, fn {c, r}, acc ->
           new_layout = MapSet.put(acc.layout, {x + c, y + r})
-          new_highest = max(acc.highest, y + r + 1)
+          new_highest = max(acc.highest, y + shape.height)
           %{acc | highest: new_highest, layout: new_layout}
         end)
 
@@ -74,7 +81,6 @@ defmodule Foo do
 
     cond do
       hits_something -> {false, y}
-      y == 0 -> {false, 0}
       true -> {true, y - 1}
     end
   end
@@ -109,7 +115,7 @@ defmodule Foo do
       IO.puts("|")
     end)
 
-    IO.puts("+--------+\n")
+    IO.puts("+-------+\n")
   end
 end
 
