@@ -1,4 +1,4 @@
-file = "ex1.txt"
+file = "input.txt"
 
 input_data =
   File.stream!(file)
@@ -17,33 +17,76 @@ defmodule Foo do
   }
 
   def solve1(input_data) do
-    place_shape(input_data, 3, 0, %{highest: 0, layout: MapSet.new()})
+    state = %{highest: 0, layout: MapSet.new()}
+
+    Enum.reduce(0..2022, {0, state}, fn i, {wind_index, current_state} ->
+      place_new_shape(input_data, i, wind_index, current_state)
+    end)
   end
 
-  def place_shape(input_data, shape_index, wind_index, state) do
+  def place_new_shape(input_data, shape_index, wind_index, state) do
     shape = elem(@shapes, rem(shape_index, 5))
-    y = state.highest + 3
-    x = 2
-    wind_direction = String.at(input_data, rem(wind_index, String.length(input_data)))
-
-    x = apply_wind(x, wind_direction, shape)
-    x = apply_wind(x, wind_direction, shape)
-    x = apply_wind(x, wind_direction, shape)
-    x = apply_wind(x, wind_direction, shape)
-    x = apply_wind(x, wind_direction, shape)
-    x = apply_wind(x, wind_direction, shape)
-    draw(shape, x, y, state)
+    move_shape(2, state.highest + 3, shape, input_data, wind_index, state)
   end
 
-  def apply_wind(x, direction, shape) do
+  def move_shape(x, y, shape, input_data, wind_index, state) do
+    wind_index = rem(wind_index, String.length(input_data))
+    wind_direction = String.at(input_data, wind_index)
+
+    x = apply_wind(x, y, wind_direction, shape, state)
+    {moved_down, y} = try_moving_down(x, y, shape, state)
+
+    if !moved_down do
+      new_state =
+        Enum.reduce(shape.coords, state, fn {c, r}, acc ->
+          new_layout = MapSet.put(acc.layout, {x + c, y + r})
+          new_highest = max(acc.highest, y + r + 1)
+          %{acc | highest: new_highest, layout: new_layout}
+        end)
+
+      {wind_index + 1, new_state}
+    else
+      move_shape(x, y, shape, input_data, wind_index + 1, state)
+    end
+  end
+
+  def apply_wind(x, y, direction, shape, state) do
     case direction do
       ">" ->
-        max_x = @width - shape.width + 1
-        min(max_x, x + 1)
+        if hits_something?(x, y, 1, 0, shape, state) do
+          x
+        else
+          max_x = @width - 1 - shape.width + 1
+          min(max_x, x + 1)
+        end
 
       "<" ->
-        max(0, x - 1)
+        if hits_something?(x, y, -1, 0, shape, state) do
+          x
+        else
+          max(0, x - 1)
+        end
     end
+  end
+
+  def try_moving_down(x, y, shape, state) do
+    hits_something = hits_something?(x, y, 0, -1, shape, state)
+
+    cond do
+      hits_something -> {false, y}
+      y == 0 -> {false, 0}
+      true -> {true, y - 1}
+    end
+  end
+
+  def hits_something?(x, y, dx, dy, shape, state) do
+    Enum.reduce(shape.coords, false, fn {c, r}, acc ->
+      if MapSet.member?(state.layout, {x + dx + c, y + dy + r}) do
+        true
+      else
+        acc
+      end
+    end)
   end
 
   def draw(shape, x, y, state) do
@@ -55,7 +98,7 @@ defmodule Foo do
     Enum.each((state.highest + 6)..0, fn r ->
       IO.write("|")
 
-      Enum.each(0..@width, fn c ->
+      Enum.each(0..(@width - 1), fn c ->
         if MapSet.member?(layout, {c, r}) do
           IO.write("#")
         else
@@ -65,10 +108,11 @@ defmodule Foo do
 
       IO.puts("|")
     end)
-    IO.puts("+--------+")
+
+    IO.puts("+--------+\n")
   end
 end
 
-result = Foo.solve1(input_data)
+{_, result} = Foo.solve1(input_data)
 
-# IO.puts("Answer to part 1 = #{result}")
+IO.puts("Answer to part 1 = #{result.highest}")
