@@ -8,6 +8,7 @@ input_data =
 
 defmodule Foo do
   @width 7
+  @stabilisation_count 3000
   @shapes {
     %{name: "horizontal bar", coords: [{0, 0}, {1, 0}, {2, 0}, {3, 0}], width: 4, height: 1},
     %{name: "cross", coords: [{1, 0}, {0, 1}, {1, 1}, {2, 1}, {1, 2}], width: 3, height: 3},
@@ -40,16 +41,14 @@ defmodule Foo do
 
     state = %{highest: 0, layout: initial_mapset}
 
-    # Run for a bit so it stablises
-    stablisation_count = 6000
-
+    # Run for a bit so it stabilises
     {wind_index, state} =
-      Enum.reduce(0..stablisation_count, {0, state}, fn i, {wind_index, current_state} ->
+      Enum.reduce(0..@stabilisation_count, {0, state}, fn i, {wind_index, current_state} ->
         place_new_shape(input_data, i, wind_index, current_state)
       end)
 
     # Get pattern formed by top 30 rows
-    pattern = get_pattern(30, state)
+    pattern = get_pattern(20, state)
     height = state.highest
 
     # Run until pattern repeats
@@ -57,19 +56,19 @@ defmodule Foo do
       Enum.reduce(1..2000, {wind_index, state, 0, 0, %{0 => 0}}, fn i,
                                                                     {wind_i, state, period,
                                                                      height_change, heights} ->
-        {wind_i, new_state} = place_new_shape(input_data, i + stablisation_count, wind_i, state)
-        current_pattern = get_pattern(30, new_state)
+        {wind_i, new_state} = place_new_shape(input_data, i + @stabilisation_count, wind_i, state)
+        current_pattern = get_pattern(20, new_state)
+
+        heights = Map.put(heights, i, new_state.highest - height)
 
         if MapSet.equal?(current_pattern, pattern) and period == 0 do
-          {wind_i, new_state, i, new_state.highest - height,
-           Map.put(heights, i, new_state.highest - height)}
+          {wind_i, new_state, i, new_state.highest - height, heights}
         else
-          {wind_i, new_state, period, height_change,
-           Map.put(heights, i, new_state.highest - height)}
+          {wind_i, new_state, period, height_change, heights}
         end
       end)
 
-    target = target - stablisation_count
+    target = target - @stabilisation_count - 1
     factor = div(target, period)
     remaining = rem(target, period)
     height + factor * height_change + heights[remaining]
