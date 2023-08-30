@@ -25,8 +25,66 @@ defmodule Foo do
 
     state = %{highest: 0, layout: initial_mapset}
 
-    Enum.reduce(0..2022 - 1, {0, state}, fn i, {wind_index, current_state} ->
+    Enum.reduce(0..(2022 - 1), {0, state}, fn i, {wind_index, current_state} ->
       place_new_shape(input_data, i, wind_index, current_state)
+    end)
+  end
+
+  def solve2(input_data) do
+    target = 1000000000000
+    initial_mapset =
+      Enum.reduce(0..(@width - 1), MapSet.new(), fn x, acc ->
+        MapSet.put(acc, {x, -1})
+      end)
+
+    state = %{highest: 0, layout: initial_mapset}
+
+    # Run for a bit so it stablises
+    {wind_index, state} =
+      Enum.reduce(0..6000, {0, state}, fn i, {wind_index, current_state} ->
+        place_new_shape(input_data, i, wind_index, current_state)
+      end)
+
+    # Get pattern formed by top 30 rows
+    pattern = get_pattern(30, state)
+    height = state.highest
+
+    # Run until pattern repeats
+    {_, _, period, height_change} = Enum.reduce(6001..10000, {wind_index, state, 0, 0}, fn i, {wind_i, state, period, height_change} ->
+      {wind_i, new_state} = place_new_shape(input_data, i, wind_i, state)
+      current_pattern = get_pattern(30, new_state)
+
+      if MapSet.equal?(current_pattern, pattern) and period == 0 do
+        {wind_i, new_state, i - 6000, new_state.highest - height}
+      else
+      {wind_i, new_state, period, height_change}
+      end
+    end)
+    IO.inspect(period)
+    IO.inspect(height_change)
+    target = target - 6000
+    factor = div(target, period)
+    remaining = rem(target, period)
+    IO.inspect(remaining)
+    result = height + factor * height_change
+
+    {wind_index, state} =
+      Enum.reduce(6001..6001 + remaining, {0, state}, fn i, {wind_index, current_state} ->
+        place_new_shape(input_data, i, wind_index, current_state)
+      end)
+    result = result + state.highest - height
+    IO.puts(result)
+  end
+
+  def get_pattern(num_rows, state) do
+    Enum.reduce((state.highest - num_rows)..state.highest, MapSet.new(), fn y, acc ->
+      Enum.reduce(0..(@width - 1), acc, fn x, acc ->
+        if MapSet.member?(state.layout, {x, y}) do
+          MapSet.put(acc, {x, y - state.highest + num_rows})
+        else
+          acc
+        end
+      end)
     end)
   end
 
@@ -122,3 +180,5 @@ end
 {_, result} = Foo.solve1(input_data)
 
 IO.puts("Answer to part 1 = #{result.highest}")
+
+Foo.solve2(input_data)
