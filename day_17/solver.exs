@@ -25,7 +25,7 @@ defmodule Foo do
 
     state = %{highest: 0, layout: initial_mapset}
 
-    Enum.reduce(0..2022, {0, state}, fn i, {wind_index, current_state} ->
+    Enum.reduce(0..2022 - 1, {0, state}, fn i, {wind_index, current_state} ->
       place_new_shape(input_data, i, wind_index, current_state)
     end)
   end
