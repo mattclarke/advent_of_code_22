@@ -19,21 +19,7 @@ defmodule Foo do
   @directions [{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}]
 
   def solve1(input_data) do
-    input_data
-    |> Enum.reduce(0, fn coord, acc ->
-      @directions
-      |> Enum.reduce(acc, fn dir, acc ->
-        new_coord =
-          {elem(coord, 0) + elem(dir, 0), elem(coord, 1) + elem(dir, 1),
-           elem(coord, 2) + elem(dir, 2)}
-
-        if MapSet.member?(input_data, new_coord) do
-          acc
-        else
-          acc + 1
-        end
-      end)
-    end)
+    count_adjacent_spaces_in_other_set(input_data, input_data, fn x -> x end, fn x -> x + 1 end)
   end
 
   def solve2(input_data) do
@@ -45,7 +31,16 @@ defmodule Foo do
 
     water = find_water(input_data, MapSet.new(), {max_x + 1, max_y + 1, max_z + 1}, {-1, -1, -1})
 
-    input_data
+    count_adjacent_spaces_in_other_set(input_data, water)
+  end
+
+  defp count_adjacent_spaces_in_other_set(
+         current,
+         other,
+         true_func \\ fn x -> x + 1 end,
+         false_func \\ fn x -> x end
+       ) do
+    current
     |> Enum.reduce(0, fn coord, acc ->
       @directions
       |> Enum.reduce(acc, fn dir, acc ->
@@ -53,10 +48,10 @@ defmodule Foo do
           {elem(coord, 0) + elem(dir, 0), elem(coord, 1) + elem(dir, 1),
            elem(coord, 2) + elem(dir, 2)}
 
-        if MapSet.member?(water, new_coord) do
-          acc + 1
+        if MapSet.member?(other, new_coord) do
+          true_func.(acc)
         else
-          acc
+          false_func.(acc)
         end
       end)
     end)
