@@ -8,7 +8,7 @@ input_data =
       line
       |> String.split(",")
       |> Enum.reduce([], fn ch, coords ->
-        coords ++ [String.to_integer(ch)]
+        [String.to_integer(ch)] ++ coords
       end)
       |> List.to_tuple()
 
