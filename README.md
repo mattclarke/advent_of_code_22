@@ -163,7 +163,7 @@ Pro tip:
 - Part 2: the hard bit is working out how the faces join together and how that affects the row, column and direction when moving faces. I spent a lot of time looking at a cube with numbers written on it! Not sure how to make the solution general.
 
 Update:
-- Part 2 is now general! Read on Reddit that it was possible to map any net shape toa common net (I chose the standard cross shape), so then it is only necessary to solve for that shape. There is some complication in mapping a net to a common net but it is okay. 
+- Part 2 is now general! Read on Reddit that it was possible to map any net shape to a common net (I chose the standard cross shape), so then it is only necessary to solve for that shape. There is some complication in mapping a net to a common net but it is okay. 
 
 ## Day 23
 - Part 1: implement the algorithm. I had to do two passes, one to find the positions where two or more elves wanted to move to and one to do the moves if allowed. Can the duplication be reduced?
