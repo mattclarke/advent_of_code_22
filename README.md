@@ -182,6 +182,12 @@ Update:
 - Creating the wind cache beforehand and indexing it by the minute modulo the cache length brings it down to ~3 seconds (because it removes the excessive tuple creation I was using when creating the cache). Hat-tip to JP for the idea of creating the cache first and using the minute as the key!
 - heapq is unnecessary, using a standard deque-based BFS is actually faster at ~1 second.
 
+Update 2024:
+- Added a solution based on an APL solution I saw. Basically it done as a variation of Conway's game of life:
+  - From each possible position we could currently be at, we populate the compass directions and the current position.
+  - We then kill all the position where the winds are.
+  - Repeat until the end position is occupied.
+
 ## Day 25
 - Part 1: converting numbers to and from a weird base 5. Took me a while to work out how to convert back to decimal.
 - Part 2: no part 2!
